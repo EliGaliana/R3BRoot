@@ -14,9 +14,8 @@ namespace
         Int_t nTracks;
         std::vector<Int_t> PDGs;
         std::vector<TVector3> ps;
-
 			
-        void AddTrack(Int_t pdgid,
+        /*void AddTrack(Int_t pdgid,
                       Double_t px,
                       Double_t py,
                       Double_t pz,
@@ -37,8 +36,7 @@ namespace
             nTracks++;
             PDGs.push_back(pdgid);
             ps.emplace_back(TVector3(px, py, pz));
-        }
-        
+        }  */     
     };
 
     TEST(testR3BPhaseSpaceGenerator, can_add_tracks)

@@ -8,8 +8,6 @@
 
 class TClonesArray;
 class R3BCalifaPoint;
-class R3BCalifaCrystalCalData;
-class R3BCalifaCrystalCalDataSim;
 class FairVolume;
 class TGeoRotation;
 
@@ -153,7 +151,7 @@ class R3BCalifa : public R3BDetector
     TList* flGeoPar;                //!
 
     TClonesArray* fCaloCollection;           //!  The point collection
-    TClonesArray* fCaloCrystalHitCollection; //!  The crystal hit collection
+    //--TClonesArray* fCaloCrystalHitCollection; //!  The crystal hit collection
 
     //! Defining functions for energy to light output calculation
     //    TF1 *tf_p_dNs;    //!
@@ -192,7 +190,7 @@ class R3BCalifa : public R3BDetector
      **
      ** Adds a CalifaCrystalCalDataSim to the HitCollection
      **/
-    R3BCalifaCrystalCalDataSim* AddCrystalHit(Int_t type,
+    /*--R3BCalifaCrystalCalDataSim* AddCrystalHit(Int_t type,
                                               Int_t copy,
                                               Int_t ident,
                                               Double_t energy,
@@ -205,7 +203,7 @@ class R3BCalifa : public R3BDetector
                                               Int_t volid,
                                               Int_t partrackid,
                                               Int_t pdgid,
-                                              Int_t uniqueid);
+                                              Int_t uniqueid);*/
 
     /** Private method NUSmearing
      **

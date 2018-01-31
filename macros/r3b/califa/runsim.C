@@ -1,4 +1,4 @@
-void runsim(Int_t nEvents = 0)
+void runsim(Int_t nEvents = 10)
 {
 
   // =========== Configuration area =============================
@@ -9,7 +9,7 @@ void runsim(Int_t nEvents = 0)
   Bool_t fVis = true;                // Store tracks for visualization
   Bool_t fUserPList= false;          // Use of R3B special physics list
   Bool_t fR3BMagnet = true;          // Magnetic field definition
-  Bool_t fCalifaHitFinder = true;    // Apply hit finder task
+  Bool_t fCalifaHitFinder = false;    // Apply hit finder task
 
   TString fMC = "TGeant4";           // MonteCarlo engine: TGeant3, TGeant4, TFluka
   TString fGenerator = "box";        // Event generator type: box, gammas, r3b, ion, ascii
@@ -37,8 +37,10 @@ void runsim(Int_t nEvents = 0)
   TString fXBallGeo = "cal_v13a.geo.root";
 
   Bool_t  fCalifa = true;           // Califa Calorimeter
-  TString fCalifaGeo = "califa_10_v8.11.geo.root";
-  Int_t   fCalifaGeoVer = 10;
+  //TString fCalifaGeo = "califa_10_v8.11.geo.root";
+  //TString fCalifaGeo = "califa_16_v8.11_cc0.2.geo.root";
+  TString fCalifaGeo = "califa_17_v8.11_cc0.2.geo.root";
+  Int_t   fCalifaGeoVer = 17;
   Double_t fCalifaNonU = 1.0; //Non-uniformity: 1 means +-1% max deviation
 
   Bool_t  fTracker = false;          // Tracker
@@ -243,11 +245,11 @@ void runsim(Int_t nEvents = 0)
 
   if (fGenerator.CompareTo("box") == 0  ) {
 	  // 2- Define the BOX generator
-	  Double_t pdgId=211; // pion beam
+	  Double_t pdgId=22; // photon beam
 	  Double_t theta1= 30.;  // polar angle distribution
 	  Double_t theta2= 160.;
-	  Double_t momentum=.8; // 10 GeV/c
-	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 10);
+	  Double_t momentum=0.01; // 10 GeV/c
+	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
 	  boxGen->SetThetaRange (   theta1,   theta2);
 	  boxGen->SetPRange     (momentum,momentum*2.);
 	  boxGen->SetPhiRange   (0.,360.);
