@@ -7,7 +7,11 @@
 
 
 #include "FairTask.h"
+#include "TClonesArray"
 #include "R3BCalifaPoint.h"
+#include "R3BCalifaCrystalCalData.h"
+
+
 #include <TRandom3.h>
 #include <string>
 
@@ -23,8 +27,9 @@ class R3BCalifaDigitizer : public FairTask
   /** Default constructor **/  
   R3BCalifaDigitizer();
   
-  /** Standard contructor **/
-  R3BCalifaDigitizer(Double_t esigma, Double_t tsigma, Double_t ysigma);
+ /** Standard contructor **/
+ //or R3BCalifaDigitizer(Double_t esigma, Double_t tsigma, Double_t ysigma);
+ R3BCalifaDigitizer(const TString& geoFile,Int_t numGeoVersion);
 
 
   /** Destructor **/
@@ -41,31 +46,39 @@ class R3BCalifaDigitizer : public FairTask
   virtual void Finish();
   virtual void Reset();
   
-  void SetEnergyResolution(Double_t e);
-  //void SetTimeResolution(Double_t t);
-  //void SetYPositionResolution(Double_t y);
+  //Accessors functions  ?¿ o hay que poner otras
+  void SetEnergyResolution(Double_t resolution){fResolution=resolution;}
+  void SetGeometryVersion(Double_t version){fGeometryVersion=version;}
+  void SetNonUniformity(Double_t nonuniformity){fNonUniformity=nonuniformity;}
   
   //...r3bdata/califa/
   /** Constructor with arguments
   
   R3BCalifaCrystalCalData(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, ULong64_t time, Double_t tot_energy=0);
+  /** Constructor with arguments
    *@param fCrystalId   Crystal unique identifier
    *@param fEnergy      Total energy deposited on the crystal ([GeV] in sim)
-   *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
+   *@param fNf  				Total Nf (fast)
+   *@param fNs					Total Ns (slow)
    *@param fTime        Time since event start [ns]
+   *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
    **/
 
-  R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident, 
+	 /** Private method AddCrystalCal
+   **
+   ** Adds a CalifaCrystalCal data
+   **/
+  R3BCalifaCrystalCalData* AddCrystalCal(Int_t cryid, 
   																			 Double_t energy,
   																			 Double_t Nf,
   																			 Double_t Ns,
   																			 ULong64_t time,
   																			 Double_t tot_energy);
-  
-
+  																			
   protected:
   
-	  TClonesArray* fCaloCrystalHitCollection; //!  The crystal hit collection
+	  TClonesArray* fCalifaPointDataCA; //!  The crystal hit collection
+	  TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
 	  
   private:
   
@@ -96,6 +109,8 @@ class R3BCalifaDigitizer : public FairTask
     TList* flGeoPar;                //!
 
   
+    //Resolution of the CALIFA calorimeter
+    Int_t fResolution;  
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
     // Adding some non-uniformity preliminary description

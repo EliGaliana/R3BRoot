@@ -25,8 +25,10 @@ public:
   /** Constructor with arguments
    *@param fCrystalId   Crystal unique identifier
    *@param fEnergy      Total energy deposited on the crystal ([GeV] in sim)
-   *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
+   *@param fNf  				Total Nf (fast)
+   *@param fNs					Total Ns (slow)
    *@param fTime        Time since event start [ns]
+   *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
    **/
   R3BCalifaCrystalCalData(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, ULong64_t time, Double_t tot_energy=0);
 

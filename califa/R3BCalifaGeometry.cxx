@@ -269,7 +269,7 @@ const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)
       else
       {
         // Ring 2 - 16: 2x2 crystals
-        crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)
+        crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)													OK! revisar una ultima vez
         crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
         alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
         crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
@@ -286,11 +286,11 @@ const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)
     else if(iD >= 3000)
     {
       //For CC iPhos+phoswich endcap
-      crystalType = ((iD - 3000) % 24) + 1;
-      crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1;
-      Int_t alveoliType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
+      crystalType = ((iD - 3000) % 24) + 1;  //crystalType (1 to 24)      										OK!
+      crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1;//crystalCopy (1 to 32)  						 OK!
+      Int_t alveoliType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};			//OK
       //Int_t alveoliType[24]={1,2,3,4,0,0,0,0,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
-      Int_t wrappingType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+      Int_t wrappingType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};			//OK
       //Char_t nameVolume[200];
 
       nameVolume = TString::Format("/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
@@ -370,7 +370,7 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 
   int crystalId = -1;
 
-  for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())
+  for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())			//?¿
   {
     volumeNames.push_back(n->GetName());
     nodeCopies.push_back(n->GetNumber());
@@ -403,10 +403,10 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
       volumeNameCrystal = volumeNames[0];
     }
     if (strncmp(alveolusECPrefix, volumeName, 11) == 0) {
-      crystalType = atoi(volumeNameCrystal+8);     //converting to int the crystal index
+      crystalType = atoi(volumeNameCrystal+8);     //converting to int the crystal index       Comprobar que volumeNameCrystal==Crystal_i_1
       crystalCopy = cpAlv+1;
 
-      if(crystalType < 9 && crystalType%2 == 0) {
+      if(crystalType < 9 && crystalType%2 == 0) {						//?????POR¿
 	  crystalType -= 1;
       }
       crystalId = 3000 + cpAlv*24 + (crystalType-1);

@@ -167,7 +167,7 @@ class R3BCalifa : public R3BDetector
     // Adding some non-uniformity preliminary description
     Double_t fNonUniformity;
 
-    /** Private method AddHit
+    /** Private method AddPoint
      **
      ** Adds a CalifaPoint to the HitCollection
      **/

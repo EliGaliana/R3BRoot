@@ -132,6 +132,8 @@
 #include "TParticle.h"
 #include "TVirtualMC.h"
 #include "TVirtualMCStack.h"
+#include "TGeoNode.h"
+
 #include <iostream>
 #include <stdlib.h>
 
@@ -240,45 +242,148 @@ void R3BCalifa::Initialize()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 {
+		cout<<"---------------------------------------------------------- Start  ProcessHits -------------------------------------------------------------------"<<endl;
 
-	//Info FairVolume* vol
-	/*
-	 from ...FairRoot/blob/master/base/sim/FairVolume.h
-	 
-	  Int_t getMCid() {return fMCid;}
-    Int_t getCopyNo() { return fCopyNo;}
-    FairGeoNode* getGeoNode() {return fNode;}
-    Int_t getMotherId() { return fMotherId;}
-    Int_t getMotherCopyNo() {return fMotherCopyNo;}
-	
+    bool Print_Volinfo=kFALSE;//Info FairVolume* vol
+    if(Print_Volinfo)
+    {	
+				Int_t fMCid = vol->getMCid();
+				Int_t fCopyNo = vol->getCopyNo();
+				Int_t fMotherId = vol->getMotherId();
+				Int_t fMotherCopyNo = vol->getMotherCopyNo();		
+				cout<<"-------   FairVolume info   ------"<<endl;
+				cout<<"fMCid ="<<fMCid<<endl;
+				cout<<"fCopyNo ="<<fCopyNo<<endl;
+				cout<<"fMotherId ="<<fMotherId<<endl;
+				cout<<"fMotherCopyNo ="<<fMotherCopyNo<<endl;			
+		}
+		
+		//TObjArray *GetListOfGVolumes() const     {return fGVolumes;}
+		TObjArray *ListVol;
+		ListVol=gGeoManager->GetListOfGVolumes();
+		//ListVol->Print("");
+		
+		// const char *GetPath() const;
+		const char *path_GeoManager;
+		path_GeoManager=gGeoManager->GetPath();
+		cout<<"path_GeoManager= "<<path_GeoManager<<endl;
+		
+		
+	 //---------------- GeoManager
+ 
+	/* if (strncmp("/cave_1/CalifaWorld_0/Alveolus_5_0/AlveolusInner_5_1/CrystalWithWrapping_2_4_3/Crystal_2_4_1",gGeoManager->GetPath(), 92)==0){
+			  cout<<"          0_gGeoM id=420 Aqui el crystal    Crystal_2_4_1    "<<gGeoManager->GetPath()<<endl;
+	}
+	if (strncmp("/cave_1/CalifaWorld_0/Alveolus_7_4/AlveolusInner_7_1/CrystalWithWrapping_3_1_0/Crystal_3_1_1",gGeoManager->GetPath(), 92)==0){
+			  cout<<"          0_gGeoM: id= 689 Aqui el crystal Crystal_3_1_1       "<<gGeoManager->GetPath()<<endl;
+	}				
 	*/
-	
-		Int_t fMCid = vol->getMCid();
-		Int_t fCopyNo = vol->getCopyNo();
-		Int_t fMotherId = vol->getMotherId();
-		Int_t fMotherCopyNo = vol->getMotherCopyNo();
+	//------------ gMC
+        			
+  if (strncmp("/cave_1/CalifaWorld_0/Alveolus_5_0/AlveolusInner_5_1/CrystalWithWrapping_2_3_2/Crystal_2_3_1",gMC->CurrentVolPath(), 92)==0){
+        cout<<"          0_gMC: id=419 Aqui el crystal    Crystal_2_3_1     "<<gMC->CurrentVolPath()<<endl;
+	}
+	if (strncmp("/cave_1/CalifaWorld_0/Alveolus_5_0/AlveolusInner_5_1/CrystalWithWrapping_2_4_3/Crystal_2_4_1",gMC->CurrentVolPath(), 92)==0){
+				cout<<"          0_gMC: id=420 Aqui el crystal    Crystal_2_4_1    "<<gMC->CurrentVolPath()<<endl;
+	}
+  if (strncmp("/cave_1/CalifaWorld_0/Alveolus_7_4/AlveolusInner_7_1/CrystalWithWrapping_3_1_0/Crystal_3_1_1",gMC->CurrentVolPath(), 92)==0){
+         cout<<"         0_gMC: id= 689 Aqui el crystal Crystal_3_1_1       "<<gMC->CurrentVolPath()<<endl;
+  }    
+  if (strncmp("/cave_1/CalifaWorld_0/Alveolus_7_4/AlveolusInner_7_1/CrystalWithWrapping_3_2_1/Crystal_3_2_1",gMC->CurrentVolPath(), 92)==0){
+         cout<<"         0_gMC: id= 690 Aqui el crystal Crystal_3_2_1        "<<gMC->CurrentVolPath()<<endl;
+  }
+  //------------------
+        
 		
-		std::cout<<"-------   FairVolume info (vol)   ------"<<endl;
-		std::cout<<"fMCid ="<<fMCid<<endl;
-		std::cout<<"fCopyNo ="<<fCopyNo<<endl;
-		std::cout<<"fMotherId ="<<fMotherId<<endl;
-		std::cout<<"fMotherCopyNo ="<<fMotherCopyNo<<endl;
 		
-
+		
+		
     // While tracking a single particle within a crystal (volume)
     // we can rely on the latest crystal information for each step
     if (gMC->IsTrackEntering() || fCrystal == NULL)
     {
+    
+  
         // Try to get crystal information from hash table
         // TODO: Still a performance benefit to use hash table?
         gGeoManager->cd(gMC->CurrentVolPath());
         Int_t nodeId = gGeoManager->GetNodeId();
+         
+        cout<<"NodeId= "<<nodeId<<endl;
         std::map<Int_t, sCrystalInfo>::iterator it = fCrystalMap.find(nodeId);
+        if (fCrystalMap.count(nodeId)>0){
+      			cout<<nodeId<<" is an element of mymap."<<endl;//si es positiu ja esta present al mapa
+    		}
+        else{ 
+           cout<<nodeId<<" is not an element of mymap."<<endl;
+        }
+        /*TGeoManager
+        TGeoNode * GetNode(Int_t level) const
+				{return (TGeoNode*)fNodes->UncheckedAt(level);}
+        */
+        
+        
+        TGeoNode* Node=gGeoManager->GetNode(0);
+        
+        if (Node){
+        		cout<<"Tenemos el TGeoNode Node!"<<endl;
+        }else{
+        		cout<<"ERROR: no tenemos el TGeoNode Node!"<<endl;
+        }
+        /*TGeoNode
+         void TGeoNode::InspectNode() const
+         void TGeoNode::CheckShapes()
+         
+          /// Fill array with node id. Recursive on node branch.
+				 void TGeoNode::FillIdArray(Int_t &ifree, Int_t &nodeid, Int_t *array) const
+				 {
+						Int_t nd = GetNdaughters();
+						if (!nd) return;
+						TGeoNode *daughter;
+						Int_t istart = ifree; // start index for daughters
+						ifree += nd;
+						for (Int_t id=0; id<nd; id++) {
+							 daughter = GetDaughter(id);
+							 array[istart+id] = ifree;
+							 array[ifree++] = ++nodeid;
+							 daughter->FillIdArray(ifree, nodeid, array);
+						}
+ 				}
+ 				
+ 				////////////////////////////////////////////////////////////////////////////////
+				 /// Print the path (A/B/C/...) to this node on stdout
+				 
+				 void TGeoNode::ls(Option_t * //option//) const
+				 {
+				 }
+         
+        */
+        //Node->InspectNode();
+        //Node->CheckShapes();
+        Int_t ifree, nodeid;
+        Int_t* array;
+        //Node->FillIdArray(ifree,nodeid,array); //Not Work
+        //cout<<"ifree="<<ifree<<" nodeid="<<nodeid<<" array="<<array<<endl;
+        //Node->ls();//Nothing
+       
+        //gMC
+        /*
+           /// Return the name of the shape (shapeType)  and its parameters par
+    			/// for the volume specified by the path volumePath .
+    			virtual Bool_t GetShape(const TString& volumePath, TString& shapeType, TArrayD& par) = 0;
+        */
+        
+        
+        
+        
         if (it == fCrystalMap.end())
         {
+        
+        			//cout<<"NodeId= "<<nodeId<<endl;
+              
             // Not found in map => Create crystal information for crystal
             sCrystalInfo tmpInfo;
-            memset(&tmpInfo, 0, sizeof(sCrystalInfo));
+            memset(&tmpInfo, 0, sizeof(sCrystalInfo));//Fill by 0 sCrystalInfo 
             if (GetCrystalInfo(tmpInfo))
             {
                 fCrystal = &(fCrystalMap[nodeId] = tmpInfo);
@@ -289,6 +394,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
         }
         else
             fCrystal = &(it->second);
+            	
     }
 
     if (fCrystal == NULL)
@@ -449,12 +555,43 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
             return kFALSE;
 
  
+         if (gMC->IsTrackExiting()){
+         
+            const Double_t* oldpos;
+            const Double_t* olddirection;
+            Double_t newpos[3];
+            Double_t newdirection[3];
+            Double_t safety;
+            gGeoManager->FindNode(fPosOut.X(),fPosOut.Y(),fPosOut.Z());
+            oldpos = gGeoManager->GetCurrentPoint();
+            olddirection = gGeoManager->GetCurrentDirection();
+            
+            for(Int_t i=0; i<3; i++){
+                newdirection[i] = -1*olddirection[i];
+            }
+            gGeoManager->SetCurrentDirection(newdirection);
+            safety = gGeoManager->GetSafeDistance();
+            gGeoManager->SetCurrentDirection(-newdirection[0],
+                               -newdirection[1],
+                               -newdirection[2]);
+            for (Int_t i=0; i<3; i++) {
+                newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
+            }
+            fPosOut.SetX(newpos[0]);
+            fPosOut.SetY(newpos[1]);
+            fPosOut.SetZ(newpos[2]);
+           }
+           AddPoint(fTrackID, fVolumeID, fCrystal->crystalType , fCrystal->crystalCopy , fCrystal->crystalId,
+                   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
+                   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
+                   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
+                   TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
+                   fTime, fLength, fELoss, fNf, fNs);
+            
 
         // Increment number of CalifaPoints for this track
         R3BStack* stack = (R3BStack*)gMC->GetStack();
         stack->AddPoint(kCALIFA);
-
-      
 
         ResetParameters();
     }
@@ -492,110 +629,52 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
     Int_t cpCry = -1;
     Int_t volIdCry = -1;
 
-    // Crystals Ids
-    const char* bufferName = gMC->CurrentVolName();
-    volId1 = gMC->CurrentVolID(cp1);										 			//Crystal		
-    volIdCry = gMC->CurrentVolOffID(1, cpCry);								//Cry+Wrapping
-    volIdAlv = gMC->CurrentVolOffID(2, cpAlv);								//Alveolus Inner
-    // next is needed for versions 8.# and later
-    volIdSupAlv = gMC->CurrentVolOffID(3, cpSupAlv);					//Alveolus Out
+    //Crystals Ids:	
+    //Num.Id of Geant:volId1, volIdCry1, volIdAlv, volIdSupAlv
+    //Copy num. of each volume:cp1, cpCry, cpAlv, cpSupAlv
+    //																								BARREL info:								ENDCAP info:
+    const char* bufferName = gMC->CurrentVolName();	//Current Volume name					Current Volume name
+    volId1 = gMC->CurrentVolID(cp1);								//Crystal											Crystal	
+    volIdCry = gMC->CurrentVolOffID(1, cpCry);			//Cry+Wrapping								Cry+Wrapping
+    volIdAlv = gMC->CurrentVolOffID(2, cpAlv);			//Alveolus Inner							Alveolus_EC
+    volIdSupAlv = gMC->CurrentVolOffID(3, cpSupAlv);//Alveolus Out								CalifaWorld
     // LOG(ERROR) << "TEST INITIAL. " <<  gMC->CurrentVolPath()<< FairLogger::endl;
-
+		
     info.volIdAlv = volIdAlv;
     info.cpAlv = cpAlv;
     info.cpCry = cpCry;
-    std::cout<<" -------------------------------------------------------------   -> Get CryInfo"<<endl;
-    std::cout<<"---  gMCarlo Info ---"<<endl;
-    std::cout<<"bufferName= "<<bufferName<<endl;
-    std::cout<<"Path_bufferName= "<<gMC->CurrentVolPath()<<endl;
-    
-    std::cout<<"cp1= "<<cp1<<endl;
-    std::cout<<"volId1= "<<volId1<<endl;
-    std::cout<<"volIdCry= "<<volIdCry<<endl;
-    std::cout<<"volIdAlv= "<<volIdAlv<<endl;
-    std::cout<<"volIdSupAlv= "<<volIdSupAlv<<endl;
-    std::cout<<"cpCry= "<<cpCry<<endl;
-    std::cout<<"cpAlv= "<<cpAlv<<endl;
-    std::cout<<"cpSupAlv= "<<cpSupAlv<<endl;
-  
-		
-		
-    
-    //CurrentVolOffName function
-    const char *volId1_Name = gMC->CurrentVolOffName(0);
- 		const char *volIdCry_Name = gMC->CurrentVolOffName(1);
-    const char *volIdAlv_Name = gMC->CurrentVolOffName(2);
-    const char *volumeName_0 = gMC->CurrentVolOffName(3);
 
- 		std::cout<<"---  CurrentVolOffName function"<<endl;
-		std::cout<<"bufferName=volId1_Name= "<<volId1_Name<<endl;
-		std::cout<<"volIdCry_Name= "<<volIdCry_Name<<endl;
-		std::cout<<"volIdAlv_Name= "<<volIdAlv_Name<<endl;
-		std::cout<<"volumeName_0= "<<volumeName_0<<endl;
-		
-		std::cout << "Y este 0? "<<gMC->CurrentVolOffName(0) << endl;		 
-		std::cout << "Y este 1? "<<gMC->CurrentVolOffName(1) << endl;
-		std::cout << "Y este 2? "<<gMC->CurrentVolOffName(2) << endl;		 
-		std::cout << "Y este 3? "<<gMC->CurrentVolOffName(3) << endl;
-		std::cout<<"----------"<<endl;
-	
-	//------------ my code from ENSAR
-	/*
-	
-	  int crysNum;
-  const char* bufferName = gMC->CurrentVolName();
-  volId1 = gMC->CurrentVolID(cp1);
-  volIdCry = gMC->CurrentVolOffID(1,cpCry);
-  volIdAlv = gMC->CurrentVolOffID(2,cpAlv);
- 
-  volIdSupAlv = gMC->CurrentVolOffID(3,cpSupAlv);
-  volIdPetal = gMC->CurrentVolOffID(5,cpPetal);
- 
-  Int_t crystalType = 0;
-  Int_t crystalCopy = 0;
-  Int_t crystalId = 0;
-  Int_t petalCopy =0;
-  Int_t fEndcapIdentifier = 0;
-	Int_t fPhoswichIdentifier = 0;
-	
-	
-	 //The present scheme here done works with 12:
-    // it reproduces a simple petal and its copies. 
-    // cpPetal     = number of petal copy (from 1 to total number of petals)
-    // crystalType = alveolus type (from 9 to 16) [Alveolus number]
-    // cpSupAlv    = alveolus copy (16 to upper crystals and 17 to down crystals) 
-    // cpCry       = crystal copy for each alveolus (from 0 to 3)
-    // crystalCopy = (alveolus copy-16) * 4 + crystals copy +1 (from 1 to 8) 
-    // crystalId   = first petal (from 1 to 64 for the first 64 crystals)
-    //               second petal (from 65 to 128)
-    //               other petals follow the same order  
-    // (numbercopy_petal-1)*64+ (alveolus type-9)*8 + (alvelous copy-16)*4 + (crystal copy) + 1        
-    //                     (in this way, crystalId runs from 1 to number of petals*64)
-  
-  
-    const char *alveolusPrefix = "Alveolus_";
-    const char *volumeName = gMC->VolName(volIdSupAlv);
     
-    if (strncmp(alveolusPrefix, volumeName,8) == 0) {
-       crystalType = atoi(volumeName+9);//converting to int the alveolus index
-       
-       if (crystalType>8 && crystalType<17) {
-	  //running upper crystals: from 0*4+0+1=1 to 4, down crystals: from 1*4+0+1=5 to 8
-          crystalCopy = (cpSupAlv-16)*4+cpCry+1;
-        
-	  //running from 1 to 64 for first petal, 64 to 128 for second petal and so on
-          crystalId = (crystalType-9)*8+(cpSupAlv-16)*4+cpCry+1+(cpPetal-1)*64;
-       }
-
-    }else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 12."
-		      << FairLogger::endl;
-	*/
-	//------------
+    bool Print_Cryinfo=kFALSE;
+    if(Print_Cryinfo)
+    {
+		  cout<<"-------   Crystal info   ------"<<endl;	
+		  cout<<"-- from gMC"<<endl;
+		  cout<<"Path= "<<gMC->CurrentVolPath()<<endl;	
+		  cout<<"1.Current Volume "<<endl;
+		  cout<<"volId1_Name= "<<gMC->CurrentVolOffName(0)<<endl; //or bufferName
+		  cout<<"volId1= "<<volId1<<endl;	  
+		  cout<<"cp1= "<<cp1<<endl;
+		  
+		  cout<<"2."<<endl;
+		  cout <<"volIdCry_Name= "<<gMC->CurrentVolOffName(1)<<endl;
+		  cout<<"volIdCry= "<<volIdCry<<endl;
+		  cout<<"cpCry= "<<cpCry<<endl;
+		  
+		  cout<<"3."<<endl;
+		  cout <<"volIdAlv_Name= "<<gMC->CurrentVolOffName(2)<<endl;	
+		  cout<<"volIdAlv= "<<volIdAlv<<endl;
+		  cout<<"cpAlv= "<<cpAlv<<endl;
+		  	 		  
+		  cout<<"4."<<endl;
+		  cout << "volIdSupAlv_Name= "<<gMC->CurrentVolOffName(3)<<endl;
+		  cout<<"volIdSupAlv= "<<volIdSupAlv<<endl;
+		  cout<<"cpSupAlv= "<<cpSupAlv<<endl;
+			cout<<"----------"<<endl;
+		}	
 
 if (fGeometryVersion == 16 || fGeometryVersion == 17 || fGeometryVersion == 0x438b)
     {
-        // RESERVED FOR CALIFA 8.11 BARREL + CC 0.2
-				cout<<" -------------------------------  if fGeometryVersion 16 or 17  "<<endl;  
 				/*NOTE: 1. gMC->VolName(id) is virtual (not defined) so not use it
 								2. Use CurrentVolOffName without convert it into a const char, because it not works
 						    			const char *Name = gMC->CurrentVolOffName(1) NO
@@ -604,29 +683,42 @@ if (fGeometryVersion == 16 || fGeometryVersion == 17 || fGeometryVersion == 0x43
 
         const char* alveolusECPrefix = "Alveolus_EC";
         const char* alveolusPrefix = "Alveolus_";
-        const char* volumeNameCrystal = ""; 
-        //const char *volumeName = gMC->CurrentVolOffName(3);//NO funciona bien
-
+        const char* volumeNameCrystal = "";
 
         // Workaround to fix the hierarchy difference between Barrel and Endcap
         /*if (strncmp("CalifaWorld", gMC->CurrentVolOffName(3), 10) == 0)      ¿?¿?
         {
-						std::cout<<"CalifaWorld:  Aqui 1"<<endl;
-            
             volumeName = gMC->VolName(volIdAlv); //volumeName="Alveolus_Inner"   gMC->CurrentVolOffName(?);
             volumeNameCrystal = gMC->VolName(volId1); //volumeNameCrystal="Crystal" gMC->CurrentVolOffName(0);
-        }*/
-        if (strncmp(alveolusECPrefix, gMC->CurrentVolOffName(2), 11) == 0)//if (strncmp(alveolusECPrefix, gMC->CurrentVolOffName(3), 11) == 0)
-        {
-						std::cout<<"Alveolus_EC:  Aqui 2"<<endl;       
-            
-            info.crystalType = atoi(volumeNameCrystal + 8); // converting to int the crystal index
-            info.crystalCopy = cpAlv + 1;
+        }*/        
+        if (strncmp(alveolusECPrefix, gMC->CurrentVolOffName(2), 11) == 0) //ENDCAP GEOMETRY
+        //NOTE:
+        //  EndCap Geometry reproduces: Alveolus_EC/CrystalWithWrapping/Crystal
+        //  if Alveolus_Inner is added to thE EndCap Geo change this gMC->CurrentVolOffName(3)
+        { 
+						//EndCap Volumes Info:		    
+						//info.crystalType from 1 to 24
+						//info.crystalCopy from 1 to 32
+						//info.crystalId from 3000 to 3767
+						
+						/*
+						 PATH:
+							crystalType = ((iD - 3000) % 24) + 1;  from 1 to 24
+							crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1; from 1 to 32
+							Int_t alveoliType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
+							
+							Int_t wrappingType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+							
 
+							nameVolume = TString::Format("/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
+								      alveoliType[crystalType-1], crystalCopy-1, wrappingType[crystalType-1], crystalType);
+						*/
+           
+            info.crystalType = atoi(gMC->CurrentVolOffName(0) + 8); // converting to int the crystal index
+            info.crystalCopy = cpAlv + 1;
+            
             if (info.crystalType < 9)
             {
-        				std::cout<<"Aqui 2-3"<<endl;
-             
                 // CC Phoswich crystals are combined in one crystal
                 // Energies are contained in Nf -> LaBr and Ns -> LaCl
 
@@ -636,56 +728,72 @@ if (fGeometryVersion == 16 || fGeometryVersion == 17 || fGeometryVersion == 0x43
 
                 if (info.crystalType % 2 == 0)
                 {
-										std::cout<<"Aqui 2-4"<<endl;         
-         
                     // info.fPhoswichIdentifier = 2 -> LaCl
                     info.fPhoswichIdentifier = 2;
-                    info.crystalType -= 1;
+                    //info.crystalType -= 1; 	//										Aquesta linea crec que sobra...
                 }
                 else
                 {
-        							std::cout<<"Aqui 2-5"<<endl;
-        
                     // info.fPhoswichIdentifier = 1 -> LaBr
                     info.fPhoswichIdentifier = 1;
                 }
             }
-            
-        		std::cout<<"Aqui 2-6"<<endl;
-        
+                   		
             info.crystalId = 3000 + cpAlv * 24 + (info.crystalType - 1);
+          
             if (info.crystalType > 24 || info.crystalType < 1 || info.crystalCopy > 32 || info.crystalCopy < 1 ||
-                info.crystalId < 3000 || info.crystalId > 4800)
+                info.crystalId < 3000 || info.crystalId > 3767)
             {
- 			std::cout<<"Aqui 2 final-7"<<endl;
-        
                 LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 16 (CC). " << FairLogger::endl;
                 return kFALSE;
             }
-            // if BARREL
         }
-        else if (strncmp("Alveolus", gMC->CurrentVolOffName(3), 8) == 0)
-        //else if (strncmp(alveolusPrefix, volumeName, 8) == 0)
+        else if (strncmp("Alveolus", gMC->CurrentVolOffName(3), 8) == 0)//BARREL GEOMETRY
         {
-std::cout<<"Alveolus:  Aqui 8"<<endl;
-
-            info.crystalType = atoi(gMC->CurrentVolOffName(3) + 9); // converting to int the alveolus index
+        
+        	//Barrel Volumes Info:		
+					//Crystal			    volId1=num.Id Geant    & cp1=1 copy num.
+					//Cry+Wrapping    volIdCry1=num.Id Geant & cpCry=from 0 to 1 copy num.
+					//Alveolus Inner  volIdAlv=num.Id Geant  & cpAlv=1 always copy num.
+					//Alveolus Out    volIdSupAlv=num.Id Geant & cpSupAlv=from 0 to 31 copy num.								
+        	//info.crystalType from 1 to 16
+					//info.crystalCopy from 1 to 128
+					//info.crystalId from 1 to 1952
+					
+					/*PATH:
+									// First ring (single crystals)
+									crystalType = 1;  //Alv type 1
+									crystalCopy = iD;     //for Alv type 1 
+									alveolusCopy = iD;    //Alv type 1 
+									crystalInAlveolus =1;          //Alv type 1
+								
+									// Ring 2 - 16: 2x2 crystals
+									crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)
+									crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
+									alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
+									crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
+								
+									Int_t alveoliType[16]={1,2,2,2,2,3,3,4,4,4,5,5,5,6,6,6};
+				
+									nameVolume = TString::Format( 
+									"/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i/Crystal_%i_%i_1",
+									crystalType, alveolusCopy-1, 
+									crystalType, alveoliType[crystalType-1], 
+									crystalInAlveolus, crystalInAlveolus-1, 
+									alveoliType[crystalType-1], crystalInAlveolus);
+					*/
+					
+					
+          info.crystalType = atoi(gMC->CurrentVolOffName(3) + 9); // converting to int the alveolus index
+            
             if (info.crystalType == 1)
             {
-      std::cout<<"Aqui 9"<<endl;
-      std::cout<<"info.crystalCopy= "<<cpSupAlv + 1<<endl;
-      std::cout<<"info.crystalId= "<<cpSupAlv + 1<<endl;
-             
                 // only one crystal per alveoli in this ring, running from 1 to 32
                 info.crystalCopy = cpSupAlv + 1;
                 info.crystalId = cpSupAlv + 1;
             }
             else if (info.crystalType > 1 && info.crystalType < 17)
             {
-       std::cout<<"Aqui 10"<<endl;
-       std::cout<<"info.crystalCopy= "<<cpSupAlv * 4 + cpCry + 1<<endl;
-       std::cout<<"info.crystalId= "<< 32 + (info.crystalType - 2) * 128 + cpSupAlv * 4 + cpCry + 1<<endl;
-       
                 // running from 0*4+0+1=1 to 31*4+3+1=128
                 info.crystalCopy = cpSupAlv * 4 + cpCry + 1;
                 // running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
@@ -694,27 +802,25 @@ std::cout<<"Alveolus:  Aqui 8"<<endl;
             if (info.crystalType > 16 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 1952 || info.crystalId < 1)
             {
-       std::cout<<"Aqui 11"<<endl;
                 LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 16 (BARREL)." << FairLogger::endl;
                 return kFALSE;
             }
         }
         else
         {
-        std::cout<<"Aqui 12"<<endl;
             LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 16." << FairLogger::endl;
             return kFALSE;
         }
+        
+        //cout<<"---------------------------------->>  info.crystalId= "<<info.crystalId<<endl;
     }
     else
     {
-    std::cout<<"Aqui 13"<<endl;
         LOG(ERROR) << "R3BCalifa: Geometry version not available in R3BCalifa::ProcessHits(). " << FairLogger::endl;
        return kFALSE;
    }
-
    return kTRUE;
- std::cout<<" -------------------------------------------------------------   -> Finish CryInfo"<<endl<<endl<<endl;
+ 
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
@@ -746,7 +852,6 @@ void R3BCalifa::Register()
 {
      FairRootManager::Instance()->Register("CrystalPoint", GetName(),
                                           fCaloCollection, kTRUE);
-    //--FairRootManager::Instance()->Register("CalifaCrystalCalDataSim", GetName(), fCaloCrystalHitCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
