@@ -1,5 +1,7 @@
 // ---------------------------------------------------------
 // -----      R3BCalifaDigitizer source file           -----
+
+
 #include "R3BCalifa.h"
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
@@ -32,6 +34,7 @@
 #include "TVirtualMCStack.h"
 #include <iostream>
 #include <stdlib.h>
+#include <math.h> 
 
 #include "R3BCalifaPoint.h"
 #include "R3BCalifaCrystalCalData.h"
@@ -167,6 +170,17 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
   TVector3 posOut;
   TVector3 mom;
   
+  Double_t energy;
+  
+  /*
+	R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident, 
+																					 Double_t energy,
+																					 Double_t Nf,
+																					 Double_t Ns,
+																					 ULong64_t time,
+																					 Double_t tot_energy);
+	*/
+  
   for(Int_t i = 0; i < nHits; i++) {
     pointData[i] = (R3BCalifaPoint*)(fCalifaPointDataCA->At(i));
     
@@ -187,22 +201,24 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
     pointData[i]->PositionIn(posIn);
     pointData[i]->PositionOut(posOut);
     pointData[i]->MomentumOut(mom);
+    
+    
+    if (nHits==1){
+    
+    	//Energy  
+    	//momentum module:P^2 = E^2 - M^2 = (T + M)^2 - M^2 ===> P=E (M=0)
+    	//energy= sqrt(pow(pxOut,2)+ (pow(pyOut,2)+ (pow(pzOut,2))
+    
+    	AddCrystalCal(crystalId, energy?, Nf, Ns, time?, tot_energy); 
+    
+    }
+  
+ }  
+  
   
   
   
    	Bool_t existHit = 0;
-
-/*
-R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident, 
-  																			 Double_t energy,
-  																			 Double_t Nf,
-  																			 Double_t Ns,
-  																			 ULong64_t time,
-  																			 Double_t tot_energy);
-
-*/
-
-
 
         if (nCrystalHits == 0)
             AddCrystalHit(fCrystal->crystalType,
@@ -262,5 +278,39 @@ R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident,
   
   
   
-  }
+ 
 }
+
+/*
+
+// -----   Private method NUSmearing  --------------------------------------------
+Double_t R3BCalifa::NUSmearing(Double_t inputEnergy)
+{
+    // Very simple preliminary scheme where the NU is introduced as a flat random
+    // distribution with limits fNonUniformity (%) of the energy value.
+    //
+    return gRandom->Uniform(inputEnergy - inputEnergy * fNonUniformity / 100,
+                            inputEnergy + inputEnergy * fNonUniformity / 100);
+}
+
+
+
+
+// -----  Public method SetNonUniformity  ----------------------------------
+void R3BCalifa::SetNonUniformity(Double_t nonU)
+{
+    fNonUniformity = nonU;
+    LOG(INFO) << "R3BCalifa::SetNonUniformity to " << fNonUniformity << " %" << FairLogger::endl;
+}
+
+Bool_t R3BCalifa::CheckIfSensitive(std::string name)
+{
+    if (TString(name).Contains("Crystal_"))
+    {
+        return kTRUE;
+    }
+    return kFALSE;
+}
+
+
+*/

@@ -52,8 +52,7 @@ class R3BCalifaDigitizer : public FairTask
   void SetNonUniformity(Double_t nonuniformity){fNonUniformity=nonuniformity;}
   
   //...r3bdata/califa/
-  /** Constructor with arguments
-  
+  /** Constructor with arguments 
   R3BCalifaCrystalCalData(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, ULong64_t time, Double_t tot_energy=0);
   /** Constructor with arguments
    *@param fCrystalId   Crystal unique identifier
@@ -82,11 +81,6 @@ class R3BCalifaDigitizer : public FairTask
 	  
   private:
   
-   // Mapping of volume ID to crystal information
-    std::map<Int_t, sCrystalInfo> fCrystalMap;
-
-    // Current active crystal
-    sCrystalInfo* fCrystal;
 
     /** Track information to be stored until the track leaves the
     active volume. **/
@@ -109,12 +103,26 @@ class R3BCalifaDigitizer : public FairTask
     TList* flGeoPar;                //!
 
   
-    //Resolution of the CALIFA calorimeter
-    Int_t fResolution;  
-    // Selecting the geometry of the CALIFA calorimeter
-    Int_t fGeometryVersion;
-    // Adding some non-uniformity preliminary description
-		Double_t fNonUniformity;
+    
+    Int_t fResolution;  						//Resolution of the CALIFA calorimeter
+    Int_t fGeometryVersion; 				//Selecting the geometry of the CALIFA calorimeter
+		Double_t fNonUniformity;				//Adding some non-uniformity preliminary description
+		
+		
+    /** Private method NUSmearing
+     **
+     ** Smears the energy according to some non-uniformity distribution
+     ** Very simple preliminary scheme where the NU is introduced as a flat random
+     ** distribution with limits fNonUniformity (%) of the energy value.
+     **/
+     Double_t NUSmearing(Double_t inputEnergy);
+     
+     /** Public method SetNonUniformity
+     **
+     ** Defines the fNonUniformity parameter in % deviation from the central value
+     *@param nonU  Double parameter setting the maximum non-uniformity allowed
+     **/
+     void SetNonUniformity(Double_t nonU);
 	
    ClassDef(R3BFi4Digitizer,1);
   

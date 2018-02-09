@@ -295,7 +295,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
   //------------------
         
 		
-		
+	sCrystalInfo info;	
 		
 		
     // While tracking a single particle within a crystal (volume)
@@ -303,7 +303,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackEntering() || fCrystal == NULL)
     {
     
-  
+  /*
         // Try to get crystal information from hash table
         // TODO: Still a performance benefit to use hash table?
         gGeoManager->cd(gMC->CurrentVolPath());
@@ -311,70 +311,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
          
         cout<<"NodeId= "<<nodeId<<endl;
         std::map<Int_t, sCrystalInfo>::iterator it = fCrystalMap.find(nodeId);
-        if (fCrystalMap.count(nodeId)>0){
-      			cout<<nodeId<<" is an element of mymap."<<endl;//si es positiu ja esta present al mapa
-    		}
-        else{ 
-           cout<<nodeId<<" is not an element of mymap."<<endl;
-        }
-        /*TGeoManager
-        TGeoNode * GetNode(Int_t level) const
-				{return (TGeoNode*)fNodes->UncheckedAt(level);}
-        */
-        
-        
-        TGeoNode* Node=gGeoManager->GetNode(0);
-        
-        if (Node){
-        		cout<<"Tenemos el TGeoNode Node!"<<endl;
-        }else{
-        		cout<<"ERROR: no tenemos el TGeoNode Node!"<<endl;
-        }
-        /*TGeoNode
-         void TGeoNode::InspectNode() const
-         void TGeoNode::CheckShapes()
-         
-          /// Fill array with node id. Recursive on node branch.
-				 void TGeoNode::FillIdArray(Int_t &ifree, Int_t &nodeid, Int_t *array) const
-				 {
-						Int_t nd = GetNdaughters();
-						if (!nd) return;
-						TGeoNode *daughter;
-						Int_t istart = ifree; // start index for daughters
-						ifree += nd;
-						for (Int_t id=0; id<nd; id++) {
-							 daughter = GetDaughter(id);
-							 array[istart+id] = ifree;
-							 array[ifree++] = ++nodeid;
-							 daughter->FillIdArray(ifree, nodeid, array);
-						}
- 				}
- 				
- 				////////////////////////////////////////////////////////////////////////////////
-				 /// Print the path (A/B/C/...) to this node on stdout
-				 
-				 void TGeoNode::ls(Option_t * //option//) const
-				 {
-				 }
-         
-        */
-        //Node->InspectNode();
-        //Node->CheckShapes();
-        Int_t ifree, nodeid;
-        Int_t* array;
-        //Node->FillIdArray(ifree,nodeid,array); //Not Work
-        //cout<<"ifree="<<ifree<<" nodeid="<<nodeid<<" array="<<array<<endl;
-        //Node->ls();//Nothing
        
-        //gMC
-        /*
-           /// Return the name of the shape (shapeType)  and its parameters par
-    			/// for the volume specified by the path volumePath .
-    			virtual Bool_t GetShape(const TString& volumePath, TString& shapeType, TArrayD& par) = 0;
-        */
-        
-        
-        
         
         if (it == fCrystalMap.end())
         {
@@ -394,6 +331,12 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
         }
         else
             fCrystal = &(it->second);
+          */
+          
+          
+          GetCrystalInfo(info);
+          info.density = gGeoManager->GetCurrentVolume()->GetMaterial()->GetDensity();
+          
             	
     }
 
@@ -407,9 +350,9 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     }
 
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BCalifa: Processing Points in Alveolus Nb " << fCrystal->volIdAlv << ", copy Nb "
-                  << fCrystal->cpAlv << ", crystal copy Nb " << fCrystal->cpCry << " and unique crystal identifier "
-                  << fCrystal->crystalId << FairLogger::endl;
+        LOG(INFO) << "R3BCalifa: Processing Points in Alveolus Nb " << info.volIdAlv << ", copy Nb "
+                  << info.cpAlv << ", crystal copy Nb " << info.cpCry << " and unique crystal identifier "
+                  << info.crystalId << FairLogger::endl;
 
     if (gMC->IsTrackEntering())
     {
@@ -428,7 +371,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     Double_t dE = gMC->Edep() * 1000.;                          // in MeV
     Double_t post_E = (gMC->Etot() - gMC->TrackMass()) * 1000.; // in MeV
     TString ptype = gMC->GetStack()->GetCurrentTrack()->GetName();
-    Double_t dx = gMC->TrackStep() * fCrystal->density;
+    Double_t dx = gMC->TrackStep() * info.density;
 
     Double_t M_in = gMC->TrackMass() * 1000.;
     Double_t A_in = M_in / U_MEV;
@@ -453,15 +396,15 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
         //    cout << ptype << " E = " << post_E << " MeV, dE = " << dE << " MeV, dx = " << dx << " g/cm**2" << ", dE/dx
         //    = " << (dE/dx) << " MeV cm**2/g" << endl;
 
-        if (fCrystal->fEndcapIdentifier == 1)
+        if (info.fEndcapIdentifier == 1)
         {
             // CC Phoswich
-            if (fCrystal->fPhoswichIdentifier == 1)
+            if (info.fPhoswichIdentifier == 1)
             {
                 // LaBr
                 fNf += dE;
             }
-            else if (fCrystal->fPhoswichIdentifier == 2)
+            else if (info.fPhoswichIdentifier == 2)
             {
                 // LaCl
                 fNs += dE;
@@ -472,7 +415,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
                            << FairLogger::endl;
             }
         }
-        else if (fCrystal->fEndcapIdentifier == 0)
+        else if (info.fEndcapIdentifier == 0)
         {
             //    if (ptype == "e-" || ptype == "e+" || ptype == "gamma") {
             //      fNs += tf_g_dNs->Integral(post_E, post_E + dE);
@@ -581,7 +524,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
             fPosOut.SetY(newpos[1]);
             fPosOut.SetZ(newpos[2]);
            }
-           AddPoint(fTrackID, fVolumeID, fCrystal->crystalType , fCrystal->crystalCopy , fCrystal->crystalId,
+           AddPoint(fTrackID, fVolumeID, info.crystalType , info.crystalCopy , info.crystalId,
                    TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
                    TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
                    TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
