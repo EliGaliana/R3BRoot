@@ -1,4 +1,4 @@
-void runsim(Int_t nEvents = 500)
+void runsim(Int_t nEvents = 100)
 {
 
   // =========== Configuration area =============================
@@ -8,7 +8,7 @@ void runsim(Int_t nEvents = 500)
 
   Bool_t fVis = true;                // Store tracks for visualization
   Bool_t fUserPList= false;          // Use of R3B special physics list
-  Bool_t fR3BMagnet = true;          // Magnetic field definition
+  Bool_t fR3BMagnet = false;          // Magnetic field definition
   Bool_t fCalifaHitFinder = false;    // Apply hit finder task
 
   TString fMC = "TGeant4";           // MonteCarlo engine: TGeant3, TGeant4, TFluka
@@ -245,11 +245,11 @@ void runsim(Int_t nEvents = 500)
 
   if (fGenerator.CompareTo("box") == 0  ) {
 	  // 2- Define the BOX generator
-	  Double_t pdgId=22; // photon beam
+	  Double_t pdgId=211; // pion beam
 	  Double_t theta1= 30.;  // polar angle distribution
 	  Double_t theta2= 160.;
-	  Double_t momentum=0.01; // 10 GeV/c
-	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
+	  Double_t momentum=.8; // 10 GeV/c
+	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 10);
 	  boxGen->SetThetaRange (   theta1,   theta2);
 	  boxGen->SetPRange     (momentum,momentum*2.);
 	  boxGen->SetPhiRange   (0.,360.);
@@ -274,6 +274,8 @@ void runsim(Int_t nEvents = 500)
     califaHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
     run->AddTask(califaHF);
   }
+  R3BCalifaDigitizer* califaDigit = new R3BCalifaDigitizer();
+  run->AddTask(califaDigit);
 
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
@@ -288,6 +290,7 @@ void runsim(Int_t nEvents = 500)
   rtdb->print();
 
   // -----   Start run   ----------------------------------------------------
+  //run->Init();
   if (nEvents>0) run->Run(nEvents);
 
   // -----   Finish   -------------------------------------------------------
@@ -306,5 +309,3 @@ void runsim(Int_t nEvents = 500)
   cout << " All ok " << endl;
 
 }
-
-

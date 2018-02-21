@@ -133,6 +133,7 @@
 #include "TVirtualMC.h"
 #include "TVirtualMCStack.h"
 #include "TGeoNode.h"
+#include "R3BCalifaGeometry.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -242,8 +243,6 @@ void R3BCalifa::Initialize()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 {
-		cout<<"---------------------------------------------------------- Start  ProcessHits -------------------------------------------------------------------"<<endl;
-
     bool Print_Volinfo=kFALSE;//Info FairVolume* vol
     if(Print_Volinfo)
     {	
@@ -258,65 +257,36 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 				cout<<"fMotherCopyNo ="<<fMotherCopyNo<<endl;			
 		}
 		
-		//TObjArray *GetListOfGVolumes() const     {return fGVolumes;}
-		TObjArray *ListVol;
-		ListVol=gGeoManager->GetListOfGVolumes();
-		//ListVol->Print("");
-		
-		// const char *GetPath() const;
-		const char *path_GeoManager;
-		path_GeoManager=gGeoManager->GetPath();
-		cout<<"path_GeoManager= "<<path_GeoManager<<endl;
-		
-		
-	 //---------------- GeoManager
- 
-	/* if (strncmp("/cave_1/CalifaWorld_0/Alveolus_5_0/AlveolusInner_5_1/CrystalWithWrapping_2_4_3/Crystal_2_4_1",gGeoManager->GetPath(), 92)==0){
-			  cout<<"          0_gGeoM id=420 Aqui el crystal    Crystal_2_4_1    "<<gGeoManager->GetPath()<<endl;
-	}
-	if (strncmp("/cave_1/CalifaWorld_0/Alveolus_7_4/AlveolusInner_7_1/CrystalWithWrapping_3_1_0/Crystal_3_1_1",gGeoManager->GetPath(), 92)==0){
-			  cout<<"          0_gGeoM: id= 689 Aqui el crystal Crystal_3_1_1       "<<gGeoManager->GetPath()<<endl;
-	}				
-	*/
-	//------------ gMC
-        			
-  if (strncmp("/cave_1/CalifaWorld_0/Alveolus_5_0/AlveolusInner_5_1/CrystalWithWrapping_2_3_2/Crystal_2_3_1",gMC->CurrentVolPath(), 92)==0){
-        cout<<"          0_gMC: id=419 Aqui el crystal    Crystal_2_3_1     "<<gMC->CurrentVolPath()<<endl;
-	}
-	if (strncmp("/cave_1/CalifaWorld_0/Alveolus_5_0/AlveolusInner_5_1/CrystalWithWrapping_2_4_3/Crystal_2_4_1",gMC->CurrentVolPath(), 92)==0){
-				cout<<"          0_gMC: id=420 Aqui el crystal    Crystal_2_4_1    "<<gMC->CurrentVolPath()<<endl;
-	}
-  if (strncmp("/cave_1/CalifaWorld_0/Alveolus_7_4/AlveolusInner_7_1/CrystalWithWrapping_3_1_0/Crystal_3_1_1",gMC->CurrentVolPath(), 92)==0){
-         cout<<"         0_gMC: id= 689 Aqui el crystal Crystal_3_1_1       "<<gMC->CurrentVolPath()<<endl;
-  }    
-  if (strncmp("/cave_1/CalifaWorld_0/Alveolus_7_4/AlveolusInner_7_1/CrystalWithWrapping_3_2_1/Crystal_3_2_1",gMC->CurrentVolPath(), 92)==0){
-         cout<<"         0_gMC: id= 690 Aqui el crystal Crystal_3_2_1        "<<gMC->CurrentVolPath()<<endl;
-  }
-  //------------------
-        
-		
-	sCrystalInfo info;	
-		
 		
     // While tracking a single particle within a crystal (volume)
     // we can rely on the latest crystal information for each step
     if (gMC->IsTrackEntering() || fCrystal == NULL)
     {
-    
-  /*
+    		Int_t Id_Geom;
+  			//R3BCalifaGeometry* cryGeometry= new R3BCalifaGeometry(fGeometryVersion);//no va
+  			//Id_Geom=cryGeometry->GetCrystalId(gMC->CurrentVolPath());//no va
+  			//Id_Geom=R3BCalifaGeometry::Instance(fGeometryVersion)->GetCrystalId(gMC->CurrentVolPath());
+  			//cout<<"Id_Geom="<<Id_Geom<<endl;
+  			
+  			
+  			
+  			
+  			
+  			
+  			
+  			const char *path;
+  			//const char *GetCrystalVolumePath(int iD);
+  			path=R3BCalifaGeometry::Instance(fGeometryVersion)->GetCrystalVolumePath(100);
+  			
         // Try to get crystal information from hash table
         // TODO: Still a performance benefit to use hash table?
         gGeoManager->cd(gMC->CurrentVolPath());
         Int_t nodeId = gGeoManager->GetNodeId();
-         
-        cout<<"NodeId= "<<nodeId<<endl;
+                
         std::map<Int_t, sCrystalInfo>::iterator it = fCrystalMap.find(nodeId);
-       
         
         if (it == fCrystalMap.end())
         {
-        
-        			//cout<<"NodeId= "<<nodeId<<endl;
               
             // Not found in map => Create crystal information for crystal
             sCrystalInfo tmpInfo;
@@ -331,12 +301,6 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
         }
         else
             fCrystal = &(it->second);
-          */
-          
-          
-          GetCrystalInfo(info);
-          info.density = gGeoManager->GetCurrentVolume()->GetMaterial()->GetDensity();
-          
             	
     }
 
@@ -350,9 +314,9 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     }
 
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BCalifa: Processing Points in Alveolus Nb " << info.volIdAlv << ", copy Nb "
-                  << info.cpAlv << ", crystal copy Nb " << info.cpCry << " and unique crystal identifier "
-                  << info.crystalId << FairLogger::endl;
+        LOG(INFO) << "R3BCalifa: Processing Points in Alveolus Nb " << fCrystal->volIdAlv << ", copy Nb "
+                  << fCrystal->cpAlv << ", crystal copy Nb " << fCrystal->cpCry << " and unique crystal identifier "
+                  << fCrystal->crystalId << FairLogger::endl;
 
     if (gMC->IsTrackEntering())
     {
@@ -371,7 +335,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     Double_t dE = gMC->Edep() * 1000.;                          // in MeV
     Double_t post_E = (gMC->Etot() - gMC->TrackMass()) * 1000.; // in MeV
     TString ptype = gMC->GetStack()->GetCurrentTrack()->GetName();
-    Double_t dx = gMC->TrackStep() * info.density;
+    Double_t dx = gMC->TrackStep() * fCrystal->density;
 
     Double_t M_in = gMC->TrackMass() * 1000.;
     Double_t A_in = M_in / U_MEV;
@@ -396,15 +360,15 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
         //    cout << ptype << " E = " << post_E << " MeV, dE = " << dE << " MeV, dx = " << dx << " g/cm**2" << ", dE/dx
         //    = " << (dE/dx) << " MeV cm**2/g" << endl;
 
-        if (info.fEndcapIdentifier == 1)
+        if (fCrystal->fEndcapIdentifier == 1)
         {
             // CC Phoswich
-            if (info.fPhoswichIdentifier == 1)
+            if (fCrystal->fPhoswichIdentifier == 1)
             {
                 // LaBr
                 fNf += dE;
             }
-            else if (info.fPhoswichIdentifier == 2)
+            else if (fCrystal->fPhoswichIdentifier == 2)
             {
                 // LaCl
                 fNs += dE;
@@ -415,7 +379,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
                            << FairLogger::endl;
             }
         }
-        else if (info.fEndcapIdentifier == 0)
+        else if (fCrystal->fEndcapIdentifier == 0)
         {
             //    if (ptype == "e-" || ptype == "e+" || ptype == "gamma") {
             //      fNs += tf_g_dNs->Integral(post_E, post_E + dE);
@@ -524,7 +488,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
             fPosOut.SetY(newpos[1]);
             fPosOut.SetZ(newpos[2]);
            }
-           AddPoint(fTrackID, fVolumeID, info.crystalType , info.crystalCopy , info.crystalId,
+           AddPoint(fTrackID, fVolumeID, fCrystal->crystalType , fCrystal->crystalCopy , fCrystal->crystalId,
                    TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
                    TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
                    TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -588,7 +552,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
     info.cpCry = cpCry;
 
     
-    bool Print_Cryinfo=kFALSE;
+    bool Print_Cryinfo=kTRUE;
     if(Print_Cryinfo)
     {
 		  cout<<"-------   Crystal info   ------"<<endl;	
@@ -616,8 +580,6 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
 			cout<<"----------"<<endl;
 		}	
 
-if (fGeometryVersion == 16 || fGeometryVersion == 17 || fGeometryVersion == 0x438b)
-    {
 				/*NOTE: 1. gMC->VolName(id) is virtual (not defined) so not use it
 								2. Use CurrentVolOffName without convert it into a const char, because it not works
 						    			const char *Name = gMC->CurrentVolOffName(1) NO
@@ -756,12 +718,7 @@ if (fGeometryVersion == 16 || fGeometryVersion == 17 || fGeometryVersion == 0x43
         }
         
         //cout<<"---------------------------------->>  info.crystalId= "<<info.crystalId<<endl;
-    }
-    else
-    {
-        LOG(ERROR) << "R3BCalifa: Geometry version not available in R3BCalifa::ProcessHits(). " << FairLogger::endl;
-       return kFALSE;
-   }
+
    return kTRUE;
  
 }
