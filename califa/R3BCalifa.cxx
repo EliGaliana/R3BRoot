@@ -552,7 +552,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
     info.cpCry = cpCry;
 
     
-    bool Print_Cryinfo=kTRUE;
+    bool Print_Cryinfo=kFALSE;
     if(Print_Cryinfo)
     {
 		  cout<<"-------   Crystal info   ------"<<endl;	

@@ -58,6 +58,9 @@ public:
   void SetNf(Double32_t Nf){fNf = Nf;}
   void SetNs(Double32_t Ns){fNs = Ns;}
   void SetTime(ULong64_t time){fTime = time;}
+  void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
+  void AddMoreNf(Double32_t moreNf)         { fNf += moreNf; }
+	void AddMoreNs(Double32_t moreNs) { fNs += moreNs; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;

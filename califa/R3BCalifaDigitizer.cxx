@@ -6,8 +6,9 @@
 #include "TClonesArray.h"
 #include "FairRootManager.h"
 #include "TRandom.h"
-#include "TArrayF.h"
+#include "TArrayD.h"
 #include "TVector3.h"
+#include "TMath.h"
 #include <iostream>
 #include <stdlib.h>
 #include "R3BCalifaPoint.h"
@@ -40,6 +41,18 @@ R3BCalifaDigitizer::R3BCalifaDigitizer(const TString& geoFile) : FairTask("R3B C
 //Virtual R3BCalifaDigitizer: Destructor
 R3BCalifaDigitizer::~R3BCalifaDigitizer()
 {
+
+		if (fCalifaPointDataCA)
+    {
+        fCalifaPointDataCA->Delete();
+        delete fCalifaPointDataCA;
+    }
+    if (fCalifaCryCalDataCA)
+    {
+        fCalifaCryCalDataCA->Delete();
+        delete fCalifaCryCalDataCA;
+    }
+
 
 	//Nota: delete TArrayF cryId[nHits], energyId[nHits], Sumaenergy[nHits];
   LOG(INFO) << "R3BCalifaDigitizer: Delete instance" << FairLogger::endl;
@@ -77,7 +90,6 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
   R3BCalifaPoint** pointData;
   pointData=new R3BCalifaPoint*[nHits];
   
- 
                             
    /*Accessors 
   Int_t GetCrystalType()   const { return fCrystalType; }
@@ -128,9 +140,21 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
 																					 ULong64_t time,
 																					 Double_t tot_energy);
 	*/
-	TArrayF cryId[nHits];
-	TArrayF energyId[nHits];
-  TArrayF Sumaenergy[nHits];
+	//TArrayD cryId[nHits];
+	//TArrayD energyId[nHits];
+  //TArrayD Sumaenergy[nHits];
+  
+ /* TArrayF* cryId[nHits]= new TArrayF();
+	TArrayF* energyId[nHits]= new TArrayF();
+  TArrayF* Sumaenergy[nHits]= new TArrayF();*/
+  
+  Double_t Ary_cryId[nHits];
+  Double_t Ary_energy[nHits];
+  Double_t Ary_Nf[nHits];
+  Double_t Ary_Ns[nHits];
+  Double_t Sumaenergy[nHits];
+  Int_t sorted[nHits];
+  
   
   for(Int_t i = 0; i < nHits; i++) {
     pointData[i] = (R3BCalifaPoint*)(fCalifaPointDataCA->At(i));
@@ -157,60 +181,167 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
     energy=pointData[i]->GetEnergyLoss();
     
     
-    //cryId[i]=crystalId;
-    cryId->SetAt(crystalId,i);
-    //energyId[i]=energy;
-    energyId->SetAt(energy,i);
-				
-								/*if (nHits==1){
-				
-									//Energy  
-									//momentum module:P^2 = E^2 - M^2 = (T + M)^2 - M^2 ===> P=E (M=0)
-									//energy= sqrt(pow(pxOut,2)+ (pow(pyOut,2)+ (pow(pzOut,2))
-				
-									AddCrystalCal(crystalId, energy, Nf, Ns, time, tot_energy); 
-				
-								}
-								else{
-				
-									while(crystalId==pointData[i+1]->GetCrystalId()){
+    Ary_cryId[i]=crystalId;
+    //cryId->SetAt(crystalId,i);
+    Ary_energy[i]=energy;
+    //energyId->SetAt(energy,i);
+    //time?
+    //Nf¿
+    Ary_Nf[i]=Nf;
+    //Ns¿
+    Ary_Ns[i]=Ns;
+		
+	}
+	
+	/*--------------------  NO!
+	
+	TMath::Sort(nHits,Ary_cryId,sorted,kFALSE);//increasing order
+	Double_t suma_energy;
+	
+	for(Int_t i=0; i<nHits; i++){
+	 
+	 if (i == 0)
+			suma_energy=Ary_energy[0];
+			
+		else{
 					
-										energy=energy+pointData[i+1]->GetEnergyLoss();
-									}
-									AddCrystalCal(crystalId, energy, Nf, Ns, time, tot_energy);
-									energy=0.;*/
-    
+					if (Ary_cryId[sorted[i]==Ary_cryId[sorted[i-1]]]){
+					
+						suma_energy=suma_energy+Ary_energy[sorted[i]];					
+					}
+					else{
+						AddCrystalCal(Ary_cryId[i], Ary_energy[0], Ary_Nf[0], Ary_Ns[0], time, tot_energy);
+					}
+	
+		}
+	}*/
+		
+	 /*-------------------------------------------------------------------------------
+	 como R3BCalifa la original
+	 
+	Int_t nCrystalHits = fCalifaCryCalDataCA->GetEntriesFast();
+	Bool_t existHit = 0; 
+	 
+	 if (nCrystalHits == 0)
+           AddCrystalCal(Ary_cryId[0], Ary_energy[0], Ary_Nf[0], Ary_Ns[0], time, tot_energy);
+   else
+   {
+            for (Int_t i=0; i<nHits; i++)
+            {
+                if (Ary_cryId[sorted[i]==Ary_cryId[sorted[i-1]]])
+                {
+                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->AddMoreEnergy(Ary_energy[sorted[i]]);
+                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->AddMoreNf(Ary_Nf[sorted[i]]);
+                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->AddMoreNs(Ary_Ns[sorted[i]]);
+                    //existHit = 1; // to avoid the creation of a new CrystalHit
+                    //break;
+                }
+            }
+           // if (!existHit)
+           //     AddCrystalCal(Ary_cryId[i], Ary_energy[i], Ary_Nf[i], Ary_Ns[i], time, tot_energy);
+		}
+		existHit = 0;*/
+	
+	
+	
+	
+	//void TMath::Sort 	(Index n, const Element* a, Index* index, Bool_t down = kTRUE) 	If down is false sort in increasing order (default is decreasing order).
+	//root [0] double a[4] = {0.34,-2.28,-0.1,4.2}
+  //root [2] Int_t idx[4]
+  //root [3] TMath::Sort(4,a,idx)
+  //root [4] for(int i=0; i<4; i++) cout << idx[i] << " " << a[i] << endl;
+  //> 3 0.34
+  //> 0 -2.28
+  //> 2 -0.1
+  //> 1 4.2
+  //or
+  //for(int i=0; i<4; i++) cout << idx[i] << " " << a[idx[i]] << endl
   
- }  
-  	// void SetAt(Double_t v, Int_t i) { AddAt((Float_t)v, i); }
-  
-  for(Int_t i=0;i<nHits;i++){
-  	
-  	//Sumaenergy[i]=energyId[i];
-  	Sumaenergy->SetAt(energyId->GetAt(i),i);
-  	
-  	if(nHits>1){
-			//Sumaenergy[i+1]=energyId[i+1];
+ /*---------------------------------------------------------------------------------------- 
+ Algoritmo de Héctor*/
+ 
+  TMath::Sort(nHits,Ary_cryId,sorted,kFALSE);//increasing order
+  //for(Int_t i=0; i<nHits; i++) {
+ 	//	 cout<< sorted[i] << " " <<Ary_cryId[i] << endl;
+  //}
+	
+	for(Int_t i=0; i<nHits; i++){
+	
+			if (i==0) AddCrystalCal(Ary_cryId[i], Ary_energy[i], Ary_Nf[i], Ary_Ns[i], time, tot_energy);
+
+			else{
+					
+					if (Ary_cryId[sorted[i]==Ary_cryId[sorted[i-1]]]){
+					
+					//((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetEnergy(Ary_energy[sorted[i]]);
+					((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->AddMoreEnergy(Ary_energy[sorted[i]]);
+					//((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->AddMoreEnergy(Ary_energy[sorted[i]]);
+					//((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->AddMoreNf(Ary_Nf[sorted[i]]);
+					//((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->AddMoreNs(Ary_Ns[sorted[i]]);
+					}
+					else{ AddCrystalCal(Ary_cryId[i], Ary_energy[i], Ary_Nf[i], Ary_Ns[i], time, tot_energy);}
+			}
+	
+	}
+	
+	/*----------------------------------------------------------------------------------
+	Eli: Va mal
+	if(nHits==1){
+			
+			AddCrystalCal(crystalId, energy, Nf, Ns, time, tot_energy);
+			cout<<"  ////////  Adding CryCal nHits==1"<<endl;
+			cout<<"crystalId= "<<crystalId<<"energy= "<<energy<<endl;
+			cout<<"Nf= "<<Nf<<"Ns= "<<Ns<<endl;	
+			cout<<"time= "<<time<<"tot_energy= "<<tot_energy<<endl;
+		
+	}else if (nHits>1){
+		
+
+		for (Int_t i=0;i<nHits;i++){
+		
+			Double_t E;
+			E=energyId[i];
+			Sumaenergy[i]=E;
+			cout<<endl<<endl<<"Aqui 1"<<endl;
+			cout<<"cryId={"<<cryId[i]<<"}"<<endl;
+			cout<<"E=energyId="<<energyId[i]<<endl;
+			cout<<"Sumaenergy=E="<<Sumaenergy[i]<<endl;
 			
 			for(Int_t j=i+1;j<nHits;j++){
-				
-				if(cryId->GetAt(i)==cryId->GetAt(j)){
-					//Sumaenergy[i]=Sumaenergy[i]+energyId[j];
-					Sumaenergy->SetAt(Sumaenergy->GetAt(i)+energyId->GetAt(j),i);
-				}//else if(cryId[j]==cryId[j+1]){
-					//Sumaenergy[j]=Sumaenergy[j]+energyId[j+1];		//MIRAR si es posa¿?
-				//} 	
-			}
-  	
-  	}
-  }
+							
+				Int_t id_i;
+				Int_t id_j;				
+				id_i=cryId[i];
+				id_j=cryId[j];
+							
+				//cout<<"Aqui 2"<<endl;
+				//cout<<"id_i="<<id_i<<" id_j"<<id_j<<endl;
+							
+				if (id_i==id_j){
+							
+					cout<<"-----------------------------------------------  Aqui 3: igual id"<<endl;
+					cout<<"id_i="<<id_i<<" id_j"<<id_j<<endl;
+					cout<<"E="<<E<<" energyId[j]="<<energyId[j]<<endl;
+					E=E+energyId[j];
+					Sumaenergy[i]=E;
+					//cout<<"E="<<E<<" Sumaenergy[i]"<<Sumaenergy[i]<<endl;
+				}
+			}  	
+	 }
+		
   
   for(Int_t i=0;i<nHits;i++){
-  	if(Sumaenergy->GetAt(i)>0){
-  			AddCrystalCal(cryId->GetAt(i), Sumaenergy->GetAt(i), pointData[i]->GetNf(), pointData[i]->GetNs(), pointData[i]->GetTime(), tot_energy);
+  	if(Sumaenergy[i]>0){
+  			AddCrystalCal(cryId[i], Sumaenergy[i], pointData[i]->GetNf(), pointData[i]->GetNs(), pointData[i]->GetTime(), tot_energy);
   															//NUSmearing(Sumaenergy[i])
+  			cout<<"  ////////  Adding CryCal nHits>1"<<endl;
+  			cout<<"crystalId= "<<cryId[i]<<"  Sumaenergy= "<<Sumaenergy[i]<<endl;
+				cout<<"Nf= "<<pointData[i]->GetNf()<<"  Ns= "<<pointData[i]->GetNs()<<endl;
+				cout<<"time= "<<pointData[i]->GetTime()<<"  tot_energy= "<<tot_energy<<endl;
   	}
   } 
+ }*/
+  
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
@@ -252,14 +383,13 @@ R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
 {
     TClonesArray& clref = *fCalifaCryCalDataCA;
     Int_t size = clref.GetEntriesFast();
-   // if (fVerboseLevel > 1)
-   // {
-        LOG(INFO) << "-I- R3BCalifaDigitizer: Adding CrystalCalData "
-                  << " with unique identifier " << ident << " entering with "
-                  << energy * 1e06 << " keV Nf=" << Nf << " Ns=" << Ns <<" Time="<<time
-                   << "tot_energy" <<tot_energy << FairLogger::endl;
-   // }
+    LOG(INFO) << "-I- R3BCalifaDigitizer: Adding CrystalCalData "
+              << " with unique identifier " << ident << " entering with "
+              << energy * 1e06 << " keV Nf=" << Nf << " Ns=" << Ns <<" Time="<<time
+              << " tot_energy=" <<tot_energy << FairLogger::endl;
+   
     return new (clref[size]) R3BCalifaCrystalCalData(ident, energy, Nf, Ns, time, tot_energy);
+    
 }
 // ----------------------------------------------------------------------------
 
