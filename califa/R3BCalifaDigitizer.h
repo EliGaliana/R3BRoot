@@ -1,5 +1,8 @@
-// ---------------------------------------------------------
-// -----      R3BCalifaDigitizer header file           -----
+// ------------------------------------------------------------
+// -----      R3BCalifaDigitizer header file           		-----
+// -----      Created 1/03/2018 by E.Galiana          		-----
+// -----                                                  -----
+// ------------------------------------------------------------
 
 
 #ifndef R3BCALIFADIGITIZER_H
@@ -23,7 +26,6 @@ class R3BCalifaDigitizer : public FairTask
   R3BCalifaDigitizer();
   
  /** Standard contructor **/
- //or R3BCalifaDigitizer(Double_t esigma, Double_t tsigma, Double_t ysigma);
  R3BCalifaDigitizer(const TString& geoFile);
 
  /** Destructor **/
@@ -55,16 +57,6 @@ class R3BCalifaDigitizer : public FairTask
 	{
 	};
  
-  //...r3bdata/califa/  
-  /** Constructor with arguments
-   *@param fCrystalId   Crystal unique identifier
-   *@param fEnergy      Total energy deposited on the crystal ([GeV] in sim)
-   *@param fNf  				Total Nf (fast)
-   *@param fNs					Total Ns (slow)
-   *@param fTime        Time since event start [ns]
-   *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
-   **/
-
 	 /** Private method AddCrystalCal
    **
    ** Adds a CalifaCrystalCal data

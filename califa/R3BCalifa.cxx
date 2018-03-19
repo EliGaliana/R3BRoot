@@ -1,105 +1,17 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalifa source file                  -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----       Last modification 15/12/16 by P.Cabanelas         -----
+// -----       			Modified by 15/12/16 by P.Cabanelas         		   -----
+// -----       			Modified by 1/03/18 by E.Galiana		         		   -----
 // -------------------------------------------------------------------------
-////////////////////////////////////////////////////////////////////////////
-// HAPOL-10/01/2014 (hector.alvarez@usc.es)
-// Moving to the new geometry scheme where all TGeo structures loads from
-// a precreated root file.
-// Next geometries are possible:
-//
-// 0 - OLD CALIFA 5.0, including BARREL and ENDCAP:
-//   NOTE: THERE IS NO WARRANTY THAT THIS VERSION WORKS AT ALL IN R3BROOT
-//   Contains 30 different crystal types, repeated 64 times (64 copies)
-//
-// 1- CALIFA 7.05, only BARREL
-//   Each ring is made of 40 alveoli of 4 crystals each.  There are 24
-//   alveoli along the polar angle for a total of 40x24=960 alveoli or
-//   3840 crystals. There are 12 different crystal shapes:
-//     @alveoliType=(1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,6,6,6);
-//     Volumes: Alveolus_[1,24] made of CrystalWithWrapping_[1,6][A,B]
-//              made of Crystal_[1,6][A,B]
-//
-// 2- CALIFA 7.07, only BARREL
-//   Each ring is made of 32 alveoli of 4 crystals each. There are 20
-//   alveoli along the polar angle for a total of 32x20=640 alveoli or
-//   2560 crystals. There are 16 different crystal shapes:
-//     @alveoliType=(1,1,2,2,2,3,3,4,4,4,5,5,6,6,6,7,7,7,8,8);
-//     Volumes: Alveolus_[1,20] made of CrystalWithWrapping_[1,8][A,B]
-//              made of Crystal_[1,8][A,B]
-//
-// 3- CALIFA 7.09, only BARREL (BP: benjamin.pietras@usc.es)
-//   The first 16 rings are made of 32 alveoli of 4 crystals each. The
-//   last 3 rings are made of 32 alveoli of 1 crystal each. There are
-//   19 alveoli along the polar angle for a total of 32x19=608 alveoli
-//   or 2144 crystals. There are 11 different crystal shapes:
-//     @alveoliType[19]={1,1,2,2,3,3,3,3,3,3,4,4,4,5,5,5,6,6,6};
-//
-// 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
-//   Each ring is made of 32 alveoli of 8, 8 and 7 crystals each. There
-//   are 3 alveoli along the polar angle for a total of 32x3=96 alveoli or
-//   736 crystals. There are 23 different crystal shapes:
-//     @alveoliType=(8,8,7);
-//     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23]
-//              made of Crystal_[1,23]
-//
-// 5- CALIFA 7.07+7.17 CsI
-//   See above the two components (2 & 4)
-//
-// 6- CALIFA 7.09+7.17 CsI
-//   See above the two components (3 & 4)
-//   Use for LaBr-LaCl endcaps CLF717_Geometry_PhoswichEndcap_5.geo
-//
-// 7- CALIFA 717PHOSWICH, only phoswich ENDCAP (JSDR: josesrs@gmail.com)
-//   (CLF717_Geometry_PhoswichEndcap_1,2.geo)  We can add here the stand
-//   alone phoswich endcap of LaBr and LaCl scintillator crystals. The
-//   endcap that is adapted to the barrel CLF707 is
-//   CLF717_Geometry_PhoswichEndcap_1.geo and the one adapts to the barrel
-//   CLF811 is CLF717_Geometry_PhoswichEndcap_2.geo
-//   The first 10 rings are made of 60 alveoli of 60 crystals each ring
-//   (azimuthal plane). The other 5 rings are made of 30 alveoli of 30
-//   crystals each ring. There are 15 alveoli along the polar angle for a
-//   total of 10x60+5x30= 750 alveoli or 1500 crystals (750 phoswich
-//   crystals). There are 30 different crystal shapes:
-//     @alveoliType=(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2);
-//   Volumes: Alveolus_EC_[1,10] made of CrystalWithWrapping_[1,60]
-//              made of Crystal_[1,60] and
-//              Alveolus_EC_[10,15] made of CrystalWithWrapping_[1,30]
-//              made of Crystal_[1,30]
-//
-// 8- CALIFA 7.07+7.17PHOSWICH
-//   See above the two components (2 & 7)
-//   Phoswich LaBr-LaCl endcaps: If we want the phoswich endcap adapted
-//   to the barrel CLF707, we use: CLF717_Geometry_PhoswichEndcap_3.geo,
-//   and with the barrel CLF811, CLF717_Geometry_PhoswichEndcap_4.geo
-//
-// 9- CALIFA 7.09+7.17PHOSWICH
-//   See above the two components (3 & 7)
-//   Use for LaBr-LaCl endcaps CLF717_Geometry_PhoswichEndcap_5.geo
-//
-// 10- CALIFA 8.11, only BARREL
-//   The first 15 rings are made of 32 alveoli of 4 crystals each. The
-//   last ring are made of 32 alveoli of 1 crystal each. There are 16
-//   alveoli along the polar angle for a total of 32x16=512 alveoli and
-//   32x15x4+32=1952 crystals. There are 11 (actually 5x2+1) different
-//   crystal shapes:
-//
-// 11- PHOSWICH ENDCAP ADAPTED TO CALIFA BARREL 8.11
-//   It is adapted to the IEM-CSIC Madrid LaBr3-LaCl3 Phoswich
-//   Endcap (CLF717_Geometry_PhoswichEndcap_6.geo)
-//
-// 12- CALIFA 8.11 +7.17 CsI
-//
-// 13- CALIFA 8.13d, only BARREL
-//
-// 14-
-////////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////////
 // Pablo Cabanelas - 15-12-2016:
 // Changing classes name from Calo to Califa acording to name convention
 //
+// EliGaliana - 1/03/2018
+// Removing old geometry versions and filling only PointData, not CrystalCal
 ////////////////////////////////////////////////////////////////////////////
 
 #include "R3BCalifa.h"
@@ -262,24 +174,12 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     // we can rely on the latest crystal information for each step
     if (gMC->IsTrackEntering() || fCrystal == NULL)
     {
-    		Int_t Id_Geom;
-  			//R3BCalifaGeometry* cryGeometry= new R3BCalifaGeometry(fGeometryVersion);//no va
-  			//Id_Geom=cryGeometry->GetCrystalId(gMC->CurrentVolPath());//no va
-  			//Id_Geom=R3BCalifaGeometry::Instance(fGeometryVersion)->GetCrystalId(gMC->CurrentVolPath());
-  			//cout<<"Id_Geom="<<Id_Geom<<endl;
-  			
-  			
-  			
-  			
-  			
-  			
-  			
-  			const char *path;
-  			//const char *GetCrystalVolumePath(int iD);
-  			path=R3BCalifaGeometry::Instance(fGeometryVersion)->GetCrystalVolumePath(100);
-  			
         // Try to get crystal information from hash table
         // TODO: Still a performance benefit to use hash table?
+				
+				// Note: there are two crystals with the same NodeId,
+				// which cause an error in the map filling 
+				// check out this error in future geometry versions   
         gGeoManager->cd(gMC->CurrentVolPath());
         Int_t nodeId = gGeoManager->GetNodeId();
                 
@@ -591,7 +491,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
         const char* volumeNameCrystal = "";
 
         // Workaround to fix the hierarchy difference between Barrel and Endcap
-        /*if (strncmp("CalifaWorld", gMC->CurrentVolOffName(3), 10) == 0)      ¿?¿?
+        /*if (strncmp("CalifaWorld", gMC->CurrentVolOffName(3), 10) == 0)
         {
             volumeName = gMC->VolName(volIdAlv); //volumeName="Alveolus_Inner"   gMC->CurrentVolOffName(?);
             volumeNameCrystal = gMC->VolName(volId1); //volumeNameCrystal="Crystal" gMC->CurrentVolOffName(0);
@@ -635,7 +535,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
                 {
                     // info.fPhoswichIdentifier = 2 -> LaCl
                     info.fPhoswichIdentifier = 2;
-                    //info.crystalType -= 1; 	//										Aquesta linea crec que sobra...
+                    //info.crystalType -= 1; 	//maybe this code line is wrong
                 }
                 else
                 {
@@ -716,8 +616,6 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 16." << FairLogger::endl;
             return kFALSE;
         }
-        
-        //cout<<"---------------------------------->>  info.crystalId= "<<info.crystalId<<endl;
 
    return kTRUE;
  
@@ -826,17 +724,6 @@ R3BCalifaPoint* R3BCalifa::AddPoint(Int_t trackID,
                   << FairLogger::endl;
     return new (clref[size])
         R3BCalifaPoint(trackID, detID, volid, copy, ident, posIn, posOut, momIn, momOut, time, length, eLoss, Nf, Ns);
-}
-
-
-// -----   Private method NUSmearing  --------------------------------------------
-Double_t R3BCalifa::NUSmearing(Double_t inputEnergy)
-{
-    // Very simple preliminary scheme where the NU is introduced as a flat random
-    // distribution with limits fNonUniformity (%) of the energy value.
-    //
-    return gRandom->Uniform(inputEnergy - inputEnergy * fNonUniformity / 100,
-                            inputEnergy + inputEnergy * fNonUniformity / 100);
 }
 
 // -----  Public method SelectGeometryVersion  ----------------------------------

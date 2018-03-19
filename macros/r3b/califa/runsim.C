@@ -1,4 +1,4 @@
-void runsim(Int_t nEvents = 10)
+void runsim(Int_t nEvents = 1000)
 {
 
   // =========== Configuration area =============================
@@ -245,13 +245,13 @@ void runsim(Int_t nEvents = 10)
 
   if (fGenerator.CompareTo("box") == 0  ) {
 	  // 2- Define the BOX generator
-	  Double_t pdgId=22; // pion beam
+	  Double_t pdgId=22; // photon beam
 	  Double_t theta1= 0.;  // polar angle distribution
 	  Double_t theta2= 180.;
-	  Double_t momentum=.001; //GeV/c
+	  Double_t momentum=2.; //GeV/c
 	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
 	  boxGen->SetThetaRange (   theta1,   theta2);
-	  boxGen->SetPRange     (momentum,momentum*2.);
+	  boxGen->SetPRange     (momentum,momentum);
 	  boxGen->SetPhiRange   (0.,360.);
 	  boxGen->SetXYZ(0.0,0.0,0.0);
 	  // add the box generator

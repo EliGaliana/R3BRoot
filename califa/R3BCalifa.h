@@ -151,7 +151,6 @@ class R3BCalifa : public R3BDetector
     TList* flGeoPar;                //!
 
     TClonesArray* fCaloCollection;           //!  The point collection
-    //--TClonesArray* fCaloCrystalHitCollection; //!  The crystal hit collection
 
     //! Defining functions for energy to light output calculation
     //    TF1 *tf_p_dNs;    //!
@@ -185,33 +184,6 @@ class R3BCalifa : public R3BDetector
                              Double_t eLoss,
                              Double_t Nf,
                              Double_t Ns);
-
-    /** Private method AddCrystalHit
-     **
-     ** Adds a CalifaCrystalCalDataSim to the HitCollection
-     **/
-    /*--R3BCalifaCrystalCalDataSim* AddCrystalHit(Int_t type,
-                                              Int_t copy,
-                                              Int_t ident,
-                                              Double_t energy,
-                                              Double_t Nf,
-                                              Double_t Ns,
-                                              Double_t tof,
-                                              Int_t steps,
-                                              Double_t einc,
-                                              Int_t trackid,
-                                              Int_t volid,
-                                              Int_t partrackid,
-                                              Int_t pdgid,
-                                              Int_t uniqueid);*/
-
-    /** Private method NUSmearing
-     **
-     ** Smears the energy according to some non-uniformity distribution
-     ** Very simple preliminary scheme where the NU is introduced as a flat random
-     ** distribution with limits fNonUniformity (%) of the energy value.
-     **/
-    Double_t NUSmearing(Double_t inputEnergy);
 
     /** Private method ResetParameters
      **
