@@ -50,10 +50,10 @@ xballData/R3BXBallPoint.cxx
 xballData/R3BXBallCrystalHit.cxx
 xballData/R3BXBallCrystalHitSim.cxx
 califaData/R3BCalifaCrystalCalData.cxx
-#califaData/R3BCalifaCrystalCalDataSim.cxx
+califaData/R3BCalifaCrystalCalDataSim.cxx
 califaData/R3BCalifaMappedData.cxx
 califaData/R3BCalifaHitData.cxx
-#califaData/R3BCalifaHitDataSim.cxx
+califaData/R3BCalifaHitDataSim.cxx
 califaData/R3BCalifaPoint.cxx
 dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx
