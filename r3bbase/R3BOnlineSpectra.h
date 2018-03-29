@@ -12,6 +12,8 @@
 #define N_PADDLE_MAX 100
 #define N_PADDLE_MAX_PTOF 100
 #define N_PSPX 4
+#define N_MAX_CRY 64
+#define N_MAX_PETALS 16
 
 #include "FairTask.h"
 
@@ -158,7 +160,7 @@ class R3BOnlineSpectra : public FairTask
     TClonesArray* fCalItemsLos;                    /**< Array with cal items. */
     TClonesArray* fMappedItemsTofd;                /**< Array with mapped items. */
     TClonesArray* fCalItemsTofd;                   /**< Array with cal items. */
-    TClonesArray* fMappedItemsPspx;                    /**< Array with mapped items. */
+    TClonesArray* fMappedItemsPspx;                /**< Array with mapped items. */
     TClonesArray* fCalItemsPspx;                    /**< Array with cal items. */
     TClonesArray* fMappedItemsFi1;                 /**< Array with mapped items. */
     TClonesArray* fHitItemsFi1;                    /**< Array with cal items. */
@@ -167,6 +169,9 @@ class R3BOnlineSpectra : public FairTask
     TClonesArray* fMappedItemsFi6;                 /**< Array with mapped items. */
     TClonesArray* fHitItemsFi6;                    /**< Array with cal items. */
     TClonesArray* fCalItemsPtof;                   /**< Array with cal items. */
+
+    TClonesArray* fMappedItemsCalifa;              /**< Array with mapped items. */
+    TClonesArray* fCalItemsCalifa;                 /**< Array with cal items. */
     
 	// check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */
@@ -212,6 +217,9 @@ class R3BOnlineSpectra : public FairTask
     Double_t flosVeffY2T;
     Double_t flosOffsetX2T;
     Double_t flosOffsetY2T; 
+		//CALIFA
+		Int_t fCalifaNumPetals;
+		Int_t fCalifaNumCrystals;
 
     TH1F *fh_los_channels;    
     TH1F *fh_los_tres_MCFD;
@@ -283,6 +291,13 @@ class R3BOnlineSpectra : public FairTask
     TH1F* fh_los_t6;
     TH1F* fh_los_t8;
   
+		//Califa
+		TH1F* fh_Califa_channels;
+		TH1F* fh_Califa_crystalId;
+		TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
+
+		TH2F* fh_Califa_cryId_chn;
+		
   public:
     ClassDef(R3BOnlineSpectra, 1)
 };
