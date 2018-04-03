@@ -1,4 +1,4 @@
-void runsim(Int_t nEvents = 0)
+void runsim(Int_t nEvents = 10)
 {
 
   // =========== Configuration area =============================
@@ -6,10 +6,10 @@ void runsim(Int_t nEvents = 0)
   TString OutFile = "sim_out.root";  // Output file for data
   TString ParFile = "sim_par.root";  // Output file for params
 
-  Bool_t fVis = true;                // Store tracks for visualization
+  Bool_t fVis = false;                // Store tracks for visualization
   Bool_t fUserPList= false;          // Use of R3B special physics list
-  Bool_t fR3BMagnet = true;          // Magnetic field definition
-  Bool_t fCalifaHitFinder = true;    // Apply hit finder task
+  Bool_t fR3BMagnet = false;          // Magnetic field definition
+  Bool_t fCalifaHitFinder = false;    // Apply hit finder task
 
   TString fMC = "TGeant4";           // MonteCarlo engine: TGeant3, TGeant4, TFluka
   TString fGenerator = "box";        // Event generator type: box, gammas, r3b, ion, ascii
@@ -37,8 +37,8 @@ void runsim(Int_t nEvents = 0)
   TString fXBallGeo = "cal_v13a.geo.root";
 
   Bool_t  fCalifa = true;           // Califa Calorimeter
-  TString fCalifaGeo = "califa_10_v8.11.geo.root";
-  Int_t   fCalifaGeoVer = 10;
+  TString fCalifaGeo = "califa_17_v8.11_cc0.2.geo.root";
+	Int_t fCalifaGeoVer = 17;
   Double_t fCalifaNonU = 1.0; //Non-uniformity: 1 means +-1% max deviation
 
   Bool_t  fTracker = false;          // Tracker
@@ -272,6 +272,7 @@ void runsim(Int_t nEvents = 0)
     califaHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
     run->AddTask(califaHF);
   }
+
 
   // -----   Initialize simulation run   ------------------------------------
   run->Init();

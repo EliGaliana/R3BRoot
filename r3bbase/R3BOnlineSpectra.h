@@ -154,6 +154,20 @@ class R3BOnlineSpectra : public FairTask
         fPaddlesPerPlane  = ppp;
     }
 
+	 /**
+     * Methods for setting number of petals and crystals
+     */
+    inline void SetCrystals(Int_t petals, Int_t cry)
+    {
+        fCalifaNumPetals = petals;
+        fCalifaNumCrystals = cry;
+    }
+		
+		 inline void SetOneCrystals(Int_t onecry)
+    {
+        fCalifaOneCrystal = onecry;
+    }
+
 
   private:
     TClonesArray* fMappedItemsLos;                 /**< Array with mapped items. */
@@ -220,6 +234,7 @@ class R3BOnlineSpectra : public FairTask
 		//CALIFA
 		Int_t fCalifaNumPetals;
 		Int_t fCalifaNumCrystals;
+		Int_t fCalifaOneCrystal;
 
     TH1F *fh_los_channels;    
     TH1F *fh_los_tres_MCFD;
@@ -295,6 +310,7 @@ class R3BOnlineSpectra : public FairTask
 		TH1F* fh_Califa_channels;
 		TH1F* fh_Califa_crystalId;
 		TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
+		TH1F* fh_Califa_chn_oneCry;
 
 		TH2F* fh_Califa_cryId_chn;
 		

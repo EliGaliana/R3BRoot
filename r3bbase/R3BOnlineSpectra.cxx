@@ -98,6 +98,7 @@ R3BOnlineSpectra::R3BOnlineSpectra()
     , fNEvents(0)
 		, fCalifaNumPetals(1)
 		, fCalifaNumCrystals(1)
+		, fCalifaOneCrystal(0)
 {
 }
 
@@ -155,6 +156,7 @@ R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
     , fNEvents(0)
 		, fCalifaNumPetals(1)
 		, fCalifaNumCrystals(1)
+		, fCalifaOneCrystal(0)
 {
 }
 
@@ -619,7 +621,7 @@ InitStatus R3BOnlineSpectra::Init()
 			 fh_tofd_channels[j]->Draw();
 			}*/
 
-			Int_t cryId=1;//not need
+			Int_t cryId=1;//not needed
 		
 			TCanvas* cCalifa3[fCalifaNumPetals];		
 			for(Int_t i=0; i<fCalifaNumPetals; i++){
@@ -638,9 +640,19 @@ InitStatus R3BOnlineSpectra::Init()
 					fh_Califa_crystals[i][j] = new TH1F(Name1, Name2, 1000, 0., 1000.);
 					cCalifa3[i]->cd(j+1);
 					fh_Califa_crystals[i][j]->Draw();
-					cryId++;//erase, not need
+					cryId++;//erase, not needed
 				}
 
+			}
+
+			if(fCalifaOneCrystal>0){
+						
+				fh_Califa_chn_oneCry = new TH1F("fh_Califa_chn_oneCry", "Califa channels for OneCrystal", 1000, 0., 1000.);
+			
+				TCanvas *cCalifa4 = new TCanvas("cCalifa4", "Califa4", 10, 10, 500, 500);
+				fh_Califa_chn_oneCry->Draw();
+				fh_Califa_chn_oneCry->GetXaxis()->SetTitle("Channel number");
+				run->AddObject(cCalifa4);
 			}
 
     }		
@@ -1421,6 +1433,27 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       fh_pspx_multiplicity_psp[3]->Fill(mult4);
       
     }
+
+    if(fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast())
+    {
+      Int_t nHits = fMappedItemsCalifa->GetEntriesFast();
+      for (Int_t ihit = 0; ihit < nHits; ihit++)
+      {
+         R3BCalifaMappedData* hit = (R3BCalifaMappedData*)fMappedItemsCalifa->At(ihit);
+         if (!hit) continue;
+/*
+fh_Califa_channels = new TH1F("fh_Califa_channels", "Califa channels", 1000, 0., 1000.);
+			fh_Califa_crystalId = new TH1F("fh_Califa_crystalId", "Crystal Id", 1024, 0., 1024);         
+			fh_Califa_cryId_chn = new TH2F("fh_Califa_cryId_chn", "Califa cryId vs channels", 1024, 0., 1024, 1000, 0., 1000.);
+		
+*/
+ 				//Double_t eny;
+				//eny=hit->GetEnergy;
+         fh_Califa_channels->Fill(hit->GetEnergy());		
+				 fh_Califa_crystalId->Fill(hit->GetCrystalId());	
+				 fh_Califa_cryId_chn->Fill(hit->GetCrystalId(),hit->GetEnergy());         
+      }
+    }
    
     fNEvents += 1;
 
@@ -1474,6 +1507,15 @@ void R3BOnlineSpectra::FinishEvent()
     {
         fHitItemsFi6->Clear();
     }
+		if (fCalItemsCalifa)
+    {
+       fCalItemsCalifa->Clear();
+    }
+		if (fMappedItemsCalifa)
+    {
+       fMappedItemsCalifa->Clear();
+    }
+		
 }
 
 void R3BOnlineSpectra::FinishTask()
@@ -1501,6 +1543,13 @@ void R3BOnlineSpectra::FinishTask()
 		fh_Fi6_ToT->Write();
 		fh_Fi6_ToTvsTime->Write();
     }
+
+		if(fMappedItemsCalifa){
+		//fh_Califa_channels->Write();
+		//fh_Califa_crystalId->Write();
+		//fh_Califa_crystals->Write();
+		//fh_Califa_cryId_chn->Write();
+		}
 }
 
 ClassImp(R3BOnlineSpectra)
