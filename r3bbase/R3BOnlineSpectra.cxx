@@ -1447,11 +1447,21 @@ fh_Califa_channels = new TH1F("fh_Califa_channels", "Califa channels", 1000, 0.,
 			fh_Califa_cryId_chn = new TH2F("fh_Califa_cryId_chn", "Califa cryId vs channels", 1024, 0., 1024, 1000, 0., 1000.);
 		
 */
- 				//Double_t eny;
-				//eny=hit->GetEnergy;
+ 				
          fh_Califa_channels->Fill(hit->GetEnergy());		
 				 fh_Califa_crystalId->Fill(hit->GetCrystalId());	
-				 fh_Califa_cryId_chn->Fill(hit->GetCrystalId(),hit->GetEnergy());         
+				 fh_Califa_cryId_chn->Fill(hit->GetCrystalId(),hit->GetEnergy());  
+				 if (hit->GetCrystalId()==fCalifaOneCrystal){fh_Califa_chn_oneCry->Fill(hit->GetEnergy());}
+
+				//TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
+				Int_t cryId;				
+				Int_t petal;
+				Int_t cryId_petal;
+			
+				cryId=hit->GetCrystalId();
+				petal=(Int_t)cryId/64 +1;//from 1 to 16
+				cryId_petal=cryId-64*(petal-1);//from 1 to 64
+				fh_Califa_crystals [petal][cryId_petal]->Fill(hit->GetEnergy());      
       }
     }
    
