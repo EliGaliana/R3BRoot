@@ -30,119 +30,119 @@ class R3BEventHeader;
 class R3BOnlineSpectra : public FairTask
 {
 
-  public:
-    /**
-     * Default constructor.
-     * Creates an instance of the task with default parameters.
-     */
-    R3BOnlineSpectra();
-
-    /**
-     * Standard constructor.
-     * Creates an instance of the task.
-     * @param name a name of the task.
-     * @param iVerbose a verbosity level.
-     */
-    R3BOnlineSpectra(const char* name, Int_t iVerbose = 1);
-
-    /**
-     * Destructor.
-     * Frees the memory used by the object.
-     */
-    virtual ~R3BOnlineSpectra();
-
-    /**
-     * Method for task initialization.
-     * This function is called by the framework before
-     * the event loop.
-     * @return Initialization status. kSUCCESS, kERROR or kFATAL.
-     */
-    virtual InitStatus Init();
-
-    /**
-     * Method for event loop implementation.
-     * Is called by the framework every time a new event is read.
-     * @param option an execution option.
-     */
-    virtual void Exec(Option_t* option);
-
-    /**
-     * A method for finish of processing of an event.
-     * Is called by the framework for each event after executing
-     * the tasks.
-     */
-    virtual void FinishEvent();
-
-    /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    virtual void FinishTask();
-
-    /**
-     * Method for setting the trigger value.
-     * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
-     */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
-    
-    /**
-     * Methods for setting position offset and effective velocity of light
-     */
-    inline void SetLosParamMCFD(Double_t offsetX1, Double_t offsetY1, Double_t veffX1, Double_t veffY1,
-                                 Double_t offsetX2, Double_t offsetY2, Double_t veffX2, Double_t veffY2)
-    {
-        flosOffsetX1 = offsetX1;
-        flosOffsetY1 = offsetY1;
-        flosVeffX1 = veffX1;
-        flosVeffY1 = veffY1;     
-        flosOffsetX2 = offsetX2;
-        flosOffsetY2 = offsetY2;
-        flosVeffX2 = veffX2;
-        flosVeffY2 = veffY2;
+ public:
+  /**
+   * Default constructor.
+   * Creates an instance of the task with default parameters.
+   */
+  R3BOnlineSpectra();
   
-    }    
+  /**
+   * Standard constructor.
+   * Creates an instance of the task.
+   * @param name a name of the task.
+   * @param iVerbose a verbosity level.
+   */
+  R3BOnlineSpectra(const char* name, Int_t iVerbose = 1);
+  
+  /**
+   * Destructor.
+   * Frees the memory used by the object.
+   */
+  virtual ~R3BOnlineSpectra();
+  
+  /**
+   * Method for task initialization.
+   * This function is called by the framework before
+   * the event loop.
+   * @return Initialization status. kSUCCESS, kERROR or kFATAL.
+   */
+  virtual InitStatus Init();
+  
+  /**
+   * Method for event loop implementation.
+   * Is called by the framework every time a new event is read.
+   * @param option an execution option.
+   */
+  virtual void Exec(Option_t* option);
+  
+  /**
+   * A method for finish of processing of an event.
+   * Is called by the framework for each event after executing
+   * the tasks.
+   */
+  virtual void FinishEvent();
+  
+  /**
+   * Method for finish of the task execution.
+   * Is called by the framework after processing the event loop.
+   */
+  virtual void FinishTask();
+  
+  /**
+   * Method for setting the trigger value.
+   * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
+   */
+  inline void SetTrigger(Int_t trigger)
+  {
+    fTrigger = trigger;
+  }
+  
+  /**
+   * Methods for setting position offset and effective velocity of light
+   */
+  inline void SetLosParamMCFD(Double_t offsetX1, Double_t offsetY1, Double_t veffX1, Double_t veffY1,
+			      Double_t offsetX2, Double_t offsetY2, Double_t veffX2, Double_t veffY2)
+  {
+    flosOffsetX1 = offsetX1;
+    flosOffsetY1 = offsetY1;
+    flosVeffX1 = veffX1;
+    flosVeffY1 = veffY1;     
+    flosOffsetX2 = offsetX2;
+    flosOffsetY2 = offsetY2;
+    flosVeffX2 = veffX2;
+    flosVeffY2 = veffY2;
     
-    inline void SetLosParamMCFDwc(Double_t offsetX1wc, Double_t offsetY1wc, Double_t veffX1wc, Double_t veffY1wc,
-                                 Double_t offsetX2wc, Double_t offsetY2wc, Double_t veffX2wc, Double_t veffY2wc)
-    {
-        flosOffsetX1wc = offsetX1wc;
-        flosOffsetY1wc = offsetY1wc;
-        flosVeffX1wc = veffX1wc;
-        flosVeffY1wc = veffY1wc;     
-        flosOffsetX2wc = offsetX2wc;
-        flosOffsetY2wc = offsetY2wc;
-        flosVeffX2wc = veffX2wc;
-        flosVeffY2wc = veffY2wc;
+  }    
+  
+  inline void SetLosParamMCFDwc(Double_t offsetX1wc, Double_t offsetY1wc, Double_t veffX1wc, Double_t veffY1wc,
+				Double_t offsetX2wc, Double_t offsetY2wc, Double_t veffX2wc, Double_t veffY2wc)
+  {
+    flosOffsetX1wc = offsetX1wc;
+    flosOffsetY1wc = offsetY1wc;
+    flosVeffX1wc = veffX1wc;
+    flosVeffY1wc = veffY1wc;     
+    flosOffsetX2wc = offsetX2wc;
+    flosOffsetY2wc = offsetY2wc;
+    flosVeffX2wc = veffX2wc;
+    flosVeffY2wc = veffY2wc;
     }    
-    
+  
     inline void SetLosParamToT(Double_t offsetX1Q, Double_t offsetY1Q, Double_t veffX1Q, Double_t veffY1Q,
-                                 Double_t offsetX2Q, Double_t offsetY2Q, Double_t veffX2Q, Double_t veffY2Q)
+			       Double_t offsetX2Q, Double_t offsetY2Q, Double_t veffX2Q, Double_t veffY2Q)
     {
-        flosOffsetX1Q = offsetX1Q;
-        flosOffsetY1Q = offsetY1Q;
-        flosVeffX1Q = veffX1Q;
-        flosVeffY1Q = veffY1Q;     
-        flosOffsetX2Q = offsetX2Q;
-        flosOffsetY2Q = offsetY2Q;
-        flosVeffX2Q = veffX2Q;
-        flosVeffY2Q = veffY2Q;
+      flosOffsetX1Q = offsetX1Q;
+      flosOffsetY1Q = offsetY1Q;
+      flosVeffX1Q = veffX1Q;
+      flosVeffY1Q = veffY1Q;     
+      flosOffsetX2Q = offsetX2Q;
+      flosOffsetY2Q = offsetY2Q;
+      flosVeffX2Q = veffX2Q;
+      flosVeffY2Q = veffY2Q;
   
     }    
     
     inline void SetLosParamTAMEX(Double_t offsetX1T, Double_t offsetY1T, Double_t veffX1T, Double_t veffY1T,
                                  Double_t offsetX2T, Double_t offsetY2T, Double_t veffX2T, Double_t veffY2T)
     {
-        flosOffsetX1T = offsetX1T;
-        flosOffsetY1T = offsetY1T;
-        flosVeffX1T = veffX1T;
-        flosVeffY1T = veffY1T;     
-        flosOffsetX2T = offsetX2T;
-        flosOffsetY2T = offsetY2T;
-        flosVeffX2T = veffX2T;
-        flosVeffY2T = veffY2T;  
+      flosOffsetX1T = offsetX1T;
+      flosOffsetY1T = offsetY1T;
+      flosVeffX1T = veffX1T;
+      flosVeffY1T = veffY1T;     
+      flosOffsetX2T = offsetX2T;
+      flosOffsetY2T = offsetY2T;
+      flosVeffX2T = veffX2T;
+      flosVeffY2T = veffY2T;  
     }     
     
     /**
@@ -150,34 +150,34 @@ class R3BOnlineSpectra : public FairTask
      */
     inline void SetNofModules(Int_t planes, Int_t ppp)
     {
-        fNofPlanes   = planes;
-        fPaddlesPerPlane  = ppp;
+      fNofPlanes   = planes;
+      fPaddlesPerPlane  = ppp;
     }
-
-	 /**
+    
+    /**
      * Methods for setting number of petals and crystals
      */
     inline void SetCrystals(Int_t petals)
     {
-        fCalifaNumPetals = petals;
+      fCalifaNumPetals = petals;
     }
-		
-		 inline void SetOneCrystals(Int_t onecry)
+    
+    inline void SetOneCrystals(Int_t onecry)
     {
-        fCalifaOneCrystal = onecry;
+      fCalifaOneCrystal = onecry;
     }
-	
-		inline void SetHistogramsRange(Int_t bins, Int_t minE, Int_t maxE, Int_t range1, Int_t range2)
+    
+    inline void SetHistogramsRange(Int_t bins, Int_t minE, Int_t maxE, Int_t range1, Int_t range2)
     {
-        fbins = bins;
-				fminE = minE;
-				fmaxE = maxE;
-				frange1=range1;
-				frange2=range2;
+      fbins = bins;
+      fminE = minE;
+      fmaxE = maxE;
+      frange1=range1;
+      frange2=range2;
     }
 
-
-  private:
+    
+ private:
     TClonesArray* fMappedItemsLos;                 /**< Array with mapped items. */
     TClonesArray* fCalItemsLos;                    /**< Array with cal items. */
     TClonesArray* fMappedItemsTofd;                /**< Array with mapped items. */
@@ -191,19 +191,19 @@ class R3BOnlineSpectra : public FairTask
     TClonesArray* fMappedItemsFi6;                 /**< Array with mapped items. */
     TClonesArray* fHitItemsFi6;                    /**< Array with cal items. */
     TClonesArray* fCalItemsPtof;                   /**< Array with cal items. */
-
+    
     TClonesArray* fMappedItemsCalifa;              /**< Array with mapped items. */
     TClonesArray* fCalItemsCalifa;                 /**< Array with cal items. */
     
-	// check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */
     Int_t fTrigger;                             /**< Trigger value. */
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
     UInt_t fNofPlanes;  
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
-
+    
     Int_t fNEvents;         /**< Event counter. */
-
+    
     UInt_t fNofDetectors;  /**< Number of detectors. */
     UInt_t fNofChannels;   /**< Number of channels per detector. */    
     UInt_t fNofModules;    /**< Total number of channels. */
@@ -239,26 +239,26 @@ class R3BOnlineSpectra : public FairTask
     Double_t flosVeffY2T;
     Double_t flosOffsetX2T;
     Double_t flosOffsetY2T; 
-		//CALIFA
-		Int_t fCalifaNumPetals;
-		Int_t fCalifaOneCrystal;
-		Int_t fbins;
-		Int_t fminE;
-		Int_t fmaxE;
-		Int_t frange1;
-		Int_t frange2;
-
+    //CALIFA
+    Int_t fCalifaNumPetals;
+    Int_t fCalifaOneCrystal;
+    Int_t fbins;
+    Int_t fminE;
+    Int_t fmaxE;
+    Int_t frange1;
+    Int_t frange2;
+    
     TH1F *fh_los_channels;    
     TH1F *fh_los_tres_MCFD;
     TH1F *fh_los_tres_TAMEX;
     TH1F *fh_los_tot;
     TH2F *fh_los_pos;
-
+    
     TH1F *fh_tofd_channels[N_PLANE_MAX];    
-
+    
     TH1F* fh_tofd_TotPm1[N_PLANE_MAX][N_PADDLE_MAX]; 
     TH1F* fh_tofd_TotPm2[N_PLANE_MAX][N_PADDLE_MAX]; 
- 
+    
  
     TH1F *fh_ptof_channels; 
     TH1F *fh_ptof_channels_cut; 
@@ -318,16 +318,16 @@ class R3BOnlineSpectra : public FairTask
     TH1F* fh_los_t6;
     TH1F* fh_los_t8;
   
-		//Califa
-		TH1F* fh_Califa_channels_per_petal[N_MAX_PETALS];	
-		TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
-		TH1F* fh_Califa_chn_oneCry;
-
-		TH2F* fh_Califa_cryId_chn;
-		TH2F* fh_Califa_cryId_petal;
-		
-  public:
+    //Califa
+    TH1F* fh_Califa_channels_per_petal[N_MAX_PETALS];	
+    TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
+    TH1F* fh_Califa_chn_oneCry;
+    
+    TH2F* fh_Califa_cryId_chn;
+    TH2F* fh_Califa_cryId_petal;
+    
+ public:
     ClassDef(R3BOnlineSpectra, 1)
-};
+      };
 
 #endif
