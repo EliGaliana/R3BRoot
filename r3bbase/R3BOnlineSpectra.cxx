@@ -97,8 +97,12 @@ R3BOnlineSpectra::R3BOnlineSpectra()
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 		, fCalifaNumPetals(1)
-		, fCalifaNumCrystals(1)
 		, fCalifaOneCrystal(0)
+		, fbins(3000)
+		, fminE(0)
+		, fmaxE(3000)
+		, frange1(100)
+		, frange2(400)
 {
 }
 
@@ -155,8 +159,12 @@ R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 		, fCalifaNumPetals(1)
-		, fCalifaNumCrystals(1)
 		, fCalifaOneCrystal(0)
+		, fbins(3000)
+		, fminE(0)
+		, fmaxE(3000)
+		, frange1(100)
+		, frange2(400)
 {
 }
 
@@ -580,81 +588,86 @@ InitStatus R3BOnlineSpectra::Init()
 	//get access to Mapped data
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
 
-	//get access to cal data
-    fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CrystalPoint");
+	//get access to Cal data
+    fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
 
     if(fMappedItemsCalifa){  
 		
-			fh_Califa_channels = new TH1F("fh_Califa_channels", "Califa channels", 1000, 0., 1000.);
-			fh_Califa_crystalId = new TH1F("fh_Califa_crystalId", "Crystal Id", 1024, 0., 1024);    
-//or fh_Califa_crystalId = new TH1F("fh_Califa_crystalId", "Crystal Id", fCalifaNumCrystals, 0.,fCalifaNumCrystals.);     
-			fh_Califa_cryId_chn = new TH2F("fh_Califa_cryId_chn", "Califa cryId vs channels", 1024, 0., 1024, 1000, 0., 1000.);
-		
-			TCanvas *cCalifa1 = new TCanvas("cCalifa1", "Califa1", 10, 10, 500, 500);
-			cCalifa1->Divide(2, 1);
-			cCalifa1->cd(1);
-			fh_Califa_channels->Draw();
-			fh_Califa_channels->GetXaxis()->SetTitle("Channel number");
-			cCalifa1->cd(2);
-			fh_Califa_crystalId->Draw();
-			fh_Califa_crystalId->GetXaxis()->SetTitle("CrystalId");
-			cCalifa1->cd(0);
+			fh_Califa_cryId_petal = new TH2F("fh_Califa_cryId_petal", "Califa petal number vs cryId", 65, 0, 65, 17, 0, 17);    
+
+			TCanvas *cCalifa1 = new TCanvas("cCalifa1", "Califa petal_num vs cryId", 10, 10, 500, 500);
+			fh_Califa_cryId_petal->Draw("colz");
+			fh_Califa_cryId_petal->GetXaxis()->SetTitle("CrystalId");
+			fh_Califa_cryId_petal->GetYaxis()->SetTitle("Petal number");
 			run->AddObject(cCalifa1);
+
+			fh_Califa_cryId_chn = new TH2F("fh_Califa_cryId_chn", "Califa energy (chn) vs cryId", 1024, 0., 1024, fbins, fminE, fmaxE);
 
 			TCanvas *cCalifa2 = new TCanvas("cCalifa2", "Califa cryId vs channels", 10, 10, 500, 500);
 			fh_Califa_cryId_chn->Draw("colz");
 			fh_Califa_cryId_chn->GetXaxis()->SetTitle("CrystalId");
-			fh_Califa_cryId_chn->GetYaxis()->SetTitle("Channel number");
-			cCalifa2->cd(0);
+			fh_Califa_cryId_chn->GetYaxis()->SetTitle("Energy (channel)");
+			fh_Califa_cryId_chn->GetYaxis()->SetRangeUser(frange1,frange2);//Range to energy(channels)
 			run->AddObject(cCalifa2);
 
-			/*TCanvas* cCalifa3[fNofPlanes];
-			//TH1F* fh_Califa_crystals [N_MAX_CRY];
-			for (Int_t j = 0; j < fCalifaNumCrystals; j++)
-			{
-			 char Name1[255];
-			 sprintf(Name1, "h_Califa_crystals_%d", j);
-			 char Name2[255];
-			 sprintf(Name2, "Califa crystals %d", j);        
-			 fh_Califa_crystals[j] = new TH1F(Name1, Name2, 1024, 0., 1024);
-			 cTofd_planes->cd(j+1);
-			 fh_tofd_channels[j]->Draw();
-			}*/
-
-			Int_t cryId=1;//not needed
 		
-			TCanvas* cCalifa3[fCalifaNumPetals];		
+			TCanvas* cCalifa3[fCalifaNumPetals][4];		
 			for(Int_t i=0; i<fCalifaNumPetals; i++){
 								
-				char strName0[255];
-				sprintf(strName0, "Califa_Petal_%d", i);
-				cCalifa3[i] = new TCanvas(strName0, "", 10, 10, 500, 500);
-				cCalifa3[i]->Divide(8,8);
+				for (Int_t k=0;k<4;k++){
 
-				for(Int_t j=0; j<fCalifaNumCrystals/fCalifaNumPetals;j++){
+					char Name0[255];
+					sprintf(Name0, "Califa_Petal_%d_%d", i+1,k+1);
+					cCalifa3[i][k] = new TCanvas(Name0, "", 10, 10, 500, 500);
+					cCalifa3[i][k]->Divide(4,4);
+
+					for(Int_t j=0; j<16;j++){
 					
-					char Name1[255];
-					sprintf(Name1, "h_Califa_Petal_%d_Crystal_%d", i, j);
-					char Name2[255];
-			 		sprintf(Name2, "Califa Petal %d Crystal %d", i, j); 
-					fh_Califa_crystals[i][j] = new TH1F(Name1, Name2, 1000, 0., 1000.);
-					cCalifa3[i]->cd(j+1);
-					fh_Califa_crystals[i][j]->Draw();
-					cryId++;//erase, not needed
+						char Name1[255];
+						sprintf(Name1, "h_Califa_Petal_%d_%d_Crystal_%d_chn", i+1, k+1, j+1);
+						char Name2[255];
+				 		sprintf(Name2, "Califa Petal %d.%d Crystal %d (chn)", i+1,k+1, j+1); //cryId 1-16
+						fh_Califa_crystals[i][j+16*k] = new TH1F(Name1, Name2, fbins, fminE, fmaxE);
+						cCalifa3[i][k]->cd(j+1);
+						fh_Califa_crystals[i][j+16*k]->Draw();
+						fh_Califa_crystals[i][j+16*k]->GetXaxis()->SetTitle("Energy (chn)");
+						fh_Califa_crystals[i][j+16*k]->GetXaxis()->SetRangeUser(frange1,frange2);//Range to energy(channels)
+						
+					}
+				run->AddObject(cCalifa3[i][k]);
 				}
-
+				
 			}
+			//run->AddObject(cCalifa3);//mirar si da error
 
 			if(fCalifaOneCrystal>0){
 						
-				fh_Califa_chn_oneCry = new TH1F("fh_Califa_chn_oneCry", "Califa channels for OneCrystal", 1000, 0., 1000.);
+				fh_Califa_chn_oneCry = new TH1F("fh_Califa_chn_oneCry", "Califa energy(chn) for OneCrystal", fbins, fminE, fmaxE);
 			
 				TCanvas *cCalifa4 = new TCanvas("cCalifa4", "Califa4", 10, 10, 500, 500);
 				fh_Califa_chn_oneCry->Draw();
-				fh_Califa_chn_oneCry->GetXaxis()->SetTitle("Channel number");
+				fh_Califa_chn_oneCry->GetXaxis()->SetTitle("Energy (chn)");
+				fh_Califa_chn_oneCry->GetXaxis()->SetRangeUser(frange1,frange2);//Range to energy(channels)
 				run->AddObject(cCalifa4);
 			}
 
+			TCanvas* cCalifa5[fCalifaNumPetals];
+			for (Int_t i=0;i<fCalifaNumPetals;i++){
+				char Name3[255];
+				sprintf(Name3, "h_Califa_channels_per_petal_%d", i+1);
+				char Name4[255];
+				sprintf(Name4, "Califa Energy (chn) per Petal %d", i+1);
+				fh_Califa_channels_per_petal[i] = new TH1F(Name3, Name4, fbins, fminE, fmaxE);
+
+				char Name5[255];
+				sprintf(Name5, "Califa_Channels_petal_%d", i+1);
+				cCalifa5[i] = new TCanvas(Name5, "", 10, 10, 500, 500);
+				fh_Califa_channels_per_petal[i]->Draw();
+				fh_Califa_channels_per_petal[i]->GetXaxis()->SetTitle("Energy (chn)");
+				fh_Califa_channels_per_petal[i]->GetXaxis()->SetRangeUser(frange1,frange2);//Range to energy(channels)
+				run->AddObject(cCalifa5[i]);//mirar si da error
+			}
+			//run->AddObject(cCalifa5);//mirar si da error
     }		
 
     return kSUCCESS;
@@ -1437,23 +1450,15 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     if(fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast())
     {
       Int_t nHits = fMappedItemsCalifa->GetEntriesFast();
+	
       for (Int_t ihit = 0; ihit < nHits; ihit++)
       {
          R3BCalifaMappedData* hit = (R3BCalifaMappedData*)fMappedItemsCalifa->At(ihit);
          if (!hit) continue;
-/*
-fh_Califa_channels = new TH1F("fh_Califa_channels", "Califa channels", 1000, 0., 1000.);
-			fh_Califa_crystalId = new TH1F("fh_Califa_crystalId", "Crystal Id", 1024, 0., 1024);         
-			fh_Califa_cryId_chn = new TH2F("fh_Califa_cryId_chn", "Califa cryId vs channels", 1024, 0., 1024, 1000, 0., 1000.);
-		
-*/
- 				
-         fh_Califa_channels->Fill(hit->GetEnergy());		
-				 fh_Califa_crystalId->Fill(hit->GetCrystalId());	
+	 	
 				 fh_Califa_cryId_chn->Fill(hit->GetCrystalId(),hit->GetEnergy());  
 				 if (hit->GetCrystalId()==fCalifaOneCrystal){fh_Califa_chn_oneCry->Fill(hit->GetEnergy());}
 
-				//TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
 				Int_t cryId;				
 				Int_t petal;
 				Int_t cryId_petal;
@@ -1461,7 +1466,10 @@ fh_Califa_channels = new TH1F("fh_Califa_channels", "Califa channels", 1000, 0.,
 				cryId=hit->GetCrystalId();
 				petal=(Int_t)cryId/64 +1;//from 1 to 16
 				cryId_petal=cryId-64*(petal-1);//from 1 to 64
-				fh_Califa_crystals [petal][cryId_petal]->Fill(hit->GetEnergy());      
+				
+				fh_Califa_crystals [petal][cryId_petal]->Fill(hit->GetEnergy());//individual energy histo for each crystalId
+				fh_Califa_channels_per_petal[petal-1]->Fill(hit->GetEnergy());//energy(channels) sum for each petal 
+				fh_Califa_cryId_petal->Fill(cryId_petal, petal);//crystalId vs petal number 
       }
     }
    
@@ -1554,12 +1562,6 @@ void R3BOnlineSpectra::FinishTask()
 		fh_Fi6_ToTvsTime->Write();
     }
 
-		if(fMappedItemsCalifa){
-		//fh_Califa_channels->Write();
-		//fh_Califa_crystalId->Write();
-		//fh_Califa_crystals->Write();
-		//fh_Califa_cryId_chn->Write();
-		}
 }
 
 ClassImp(R3BOnlineSpectra)

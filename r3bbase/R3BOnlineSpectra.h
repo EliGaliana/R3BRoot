@@ -157,15 +157,23 @@ class R3BOnlineSpectra : public FairTask
 	 /**
      * Methods for setting number of petals and crystals
      */
-    inline void SetCrystals(Int_t petals, Int_t cry)
+    inline void SetCrystals(Int_t petals)
     {
         fCalifaNumPetals = petals;
-        fCalifaNumCrystals = cry;
     }
 		
 		 inline void SetOneCrystals(Int_t onecry)
     {
         fCalifaOneCrystal = onecry;
+    }
+	
+		inline void SetHistogramsRange(Int_t bins, Int_t minE, Int_t maxE, Int_t range1, Int_t range2)
+    {
+        fbins = bins;
+				fminE = minE;
+				fmaxE = maxE;
+				frange1=range1;
+				frange2=range2;
     }
 
 
@@ -233,8 +241,12 @@ class R3BOnlineSpectra : public FairTask
     Double_t flosOffsetY2T; 
 		//CALIFA
 		Int_t fCalifaNumPetals;
-		Int_t fCalifaNumCrystals;
 		Int_t fCalifaOneCrystal;
+		Int_t fbins;
+		Int_t fminE;
+		Int_t fmaxE;
+		Int_t frange1;
+		Int_t frange2;
 
     TH1F *fh_los_channels;    
     TH1F *fh_los_tres_MCFD;
@@ -307,12 +319,12 @@ class R3BOnlineSpectra : public FairTask
     TH1F* fh_los_t8;
   
 		//Califa
-		TH1F* fh_Califa_channels;
-		TH1F* fh_Califa_crystalId;
+		TH1F* fh_Califa_channels_per_petal[N_MAX_PETALS];	
 		TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
 		TH1F* fh_Califa_chn_oneCry;
 
 		TH2F* fh_Califa_cryId_chn;
+		TH2F* fh_Califa_cryId_petal;
 		
   public:
     ClassDef(R3BOnlineSpectra, 1)
