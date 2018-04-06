@@ -16,6 +16,7 @@
 #define N_MAX_PETALS 8
 
 #include "FairTask.h"
+#include <stdbool.h>
 
 class TClonesArray;
 class TH1F;
@@ -169,6 +170,8 @@ class R3BOnlineSpectra : public FairTask
 
 		inline void ChooseCalifaFile(TString file){fCalifaFile=file;}
 
+		inline void SetDisplayCalOn(Bool_t On){fCalON=On;}
+
     
  private:
     TClonesArray* fMappedItemsLos;                 /**< Array with mapped items. */
@@ -307,15 +310,16 @@ class R3BOnlineSpectra : public FairTask
     TH1F* fh_los_t8;
   
     //Califa
-    TH1F* fh_Califa_channels_per_petal[N_MAX_PETALS];	
+    TH1F* fh_Califa_energy_per_petal[N_MAX_PETALS];	
     TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
-    TH1F* fh_Califa_chn_oneCry;
+    TH1F* fh_Califa_energy_oneCry;
     
-    TH2F* fh_Califa_cryId_chn;
+    TH2F* fh_Califa_cryId_energy;
     TH2F* fh_Califa_cryId_petal;
 
 		//File
 		TString fCalifaFile;
+		Bool_t fCalON;
 
  public:
     ClassDef(R3BOnlineSpectra, 1)
