@@ -158,12 +158,12 @@ class R3BOnlineSpectra : public FairTask
     /**
      * Methods for setting number of petals and crystals
      */
-    inline void SetCrystals(Int_t petals)
+    inline void SetPetals(Int_t petals)
     {
       fCalifaNumPetals = petals;
     }
     
-    inline void SetOneCrystals(Int_t onecry)
+    inline void SetOneCrystal(Int_t onecry)
     {
       fCalifaOneCrystal = onecry;
     }

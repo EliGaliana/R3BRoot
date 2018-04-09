@@ -22,8 +22,8 @@ void califa_febex3_ucesb() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "/mnt/scratch/eli/krakow/data_0001.lmd";
-  TString outputFileName = "/home/fpddv1/elisabet.galiana/Escritorio/R3BRoot/Calibration_Krakow17/data_0001.root";
+  TString filename = "/home/elizabet/Escritorio/R3BRoot/Krakow2017/data_0003.lmd";
+  TString outputFileName = "/home/elizabet/Escritorio/R3BRoot/Krakow2017/proves/data_0003.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
@@ -69,6 +69,19 @@ void califa_febex3_ucesb() {
   CalPar->SetThreshold(0.0001);      
   CalPar->SetEnergyPeaks(EnergythePeaks);
   run->AddTask(CalPar);
+
+	//R3BOnlineSpectra
+	//SetPetals(Int_t petals)
+	//SetOneCrystals(Int_t onecry)
+  //ChooseCalifaFile(TString file){fCalifaFile=file;}
+	//SetDisplayCalOn(Bool_t On){fCalON=On;}
+	
+	Int_t petals=1;
+	
+	R3BOnlineSpectra* online= new R3BOnlineSpectra();
+	online->SetPetals(petals);
+	online->ChooseCalifaFile("CalifaPetal.txt");
+	run->AddTask(online);
   /* ------------------------------------------------------ */
   
   /* Initialize ------------------------------------------- */

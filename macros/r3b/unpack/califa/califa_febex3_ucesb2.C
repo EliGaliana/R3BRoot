@@ -22,8 +22,8 @@ void califa_febex3_ucesb2() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "/mnt/scratch/eli/krakow/data_0001.lmd";
-  TString outputFileName = "/home/fpddv1/elisabet.galiana/Escritorio/R3BRoot/Calibration_Krakow17/data_0001.root";
+  TString filename = "/home/elizabet/Escritorio/R3BRoot/Krakow2017/data_0003.lmd";
+  TString outputFileName = "/home/elizabet/Escritorio/R3BRoot/Krakow2017/proves/data_0003.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
@@ -52,6 +52,18 @@ void califa_febex3_ucesb2() {
   //R3BCalifaMapped2CrystalCal ---
   R3BCalifaMapped2CrystalCal* Map2Cal = new R3BCalifaMapped2CrystalCal();
   run->AddTask(Map2Cal);
+
+	//R3BOnlineSpectra ---
+	Bool_t ON=true;
+	Int_t petals=1;
+	Int_t crystalId=1;
+	
+	R3BOnlineSpectra* online= new R3BOnlineSpectra();
+	online->SetDisplayCalOn(ON);
+	online->SetPetals(petals);
+	online->ChooseCalifaFile("CalifaPetal.txt");
+	online->SetOneCrystal(crystalId);
+	run->AddTask(online);
   /* ------------------------------------------------------ */
   
   /* Initialize ------------------------------------------- */
