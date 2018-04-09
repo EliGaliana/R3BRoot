@@ -167,11 +167,11 @@ class R3BOnlineSpectra : public FairTask
     {
       fCalifaOneCrystal = onecry;
     }
-
-		inline void ChooseCalifaFile(TString file){fCalifaFile=file;}
-
-		inline void SetDisplayCalOn(Bool_t On){fCalON=On;}
-
+    
+    inline void ChooseCalifaFile(TString file){fCalifaFile=file;}
+    
+    inline void SetDisplayCalOn(Bool_t On){fCalON=On;}
+    
     
  private:
     TClonesArray* fMappedItemsLos;                 /**< Array with mapped items. */
@@ -317,10 +317,10 @@ class R3BOnlineSpectra : public FairTask
     TH2F* fh_Califa_cryId_energy;
     TH2F* fh_Califa_cryId_petal;
 
-		//File
-		TString fCalifaFile;
-		Bool_t fCalON;
-
+    //File
+    TString fCalifaFile;
+    Bool_t fCalON;
+    
  public:
     ClassDef(R3BOnlineSpectra, 1)
       };
