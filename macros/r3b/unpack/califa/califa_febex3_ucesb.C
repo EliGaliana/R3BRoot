@@ -17,7 +17,6 @@ void califa_febex3_ucesb() {
   TStopwatch timer;
   timer.Start();
   
-  //const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
@@ -76,11 +75,16 @@ void califa_febex3_ucesb() {
   //ChooseCalifaFile(TString file){fCalifaFile=file;}
 	//SetDisplayCalOn(Bool_t On){fCalON=On;}
 	
+	//R3BOnlineSpectra ---
+	Bool_t ON=true;
 	Int_t petals=1;
+	Int_t crystalId=1;
 	
 	R3BOnlineSpectra* online= new R3BOnlineSpectra();
+	online->SetDisplayCalOn(ON);
 	online->SetPetals(petals);
 	online->ChooseCalifaFile("CalifaPetal.txt");
+	online->SetOneCrystal(crystalId);
 	run->AddTask(online);
   /* ------------------------------------------------------ */
   
