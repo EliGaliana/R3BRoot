@@ -548,36 +548,36 @@ InitStatus R3BOnlineSpectra::Init()
       fh_pspx_cor_y_energy->Draw();
       cpspx_strips->cd(0);
       run->AddObject(cpspx_cor);
+    
+    
+		  TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 850, 950);
+		  cLos->Divide(2, 3);
+		  
+		  fh_los_channels = new TH1F("los_channels", "LOS channels", 10, 0., 10.); 
+		  fh_los_channels->GetXaxis()->SetTitle("Channel number");
+		  fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 8000, -4., 4.);
+		  fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
+		  fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 8000, -4., 4.);  
+		  fh_los_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns"); 
+		  fh_los_pos = new TH2F("los_position", "LOS xy position not-calibrated", 2000, -10., 10.,2000, -10., 10.);
+		  fh_los_pos->GetXaxis()->SetTitle("X position / ns");
+		  fh_los_pos->GetYaxis()->SetTitle("Y position / ns"); 
+		  fh_los_tot = new TH1F("los_tot","LOS Time-over-Threshold",2500,0.,250.); 
+		  fh_los_tot->GetXaxis()->SetTitle("ToT / ns");
+		  
+		  cLos->cd(1);
+		  fh_los_channels->Draw();
+		  cLos->cd(3);
+		  fh_los_tres_MCFD->Draw();
+		  cLos->cd(4);
+		  fh_los_tres_TAMEX->Draw();
+		  cLos->cd(5);    
+		  fh_los_pos->Draw("colZ");
+		  cLos->cd(6);
+		  fh_los_tot->Draw();
+		  cLos->cd(0);
+		  run->AddObject(cLos);
     }
-    
-    TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 850, 950);
-    cLos->Divide(2, 3);
-    
-    fh_los_channels = new TH1F("los_channels", "LOS channels", 10, 0., 10.); 
-    fh_los_channels->GetXaxis()->SetTitle("Channel number");
-    fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 8000, -4., 4.);
-    fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
-    fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 8000, -4., 4.);  
-    fh_los_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns"); 
-    fh_los_pos = new TH2F("los_position", "LOS xy position not-calibrated", 2000, -10., 10.,2000, -10., 10.);
-    fh_los_pos->GetXaxis()->SetTitle("X position / ns");
-    fh_los_pos->GetYaxis()->SetTitle("Y position / ns"); 
-    fh_los_tot = new TH1F("los_tot","LOS Time-over-Threshold",2500,0.,250.); 
-    fh_los_tot->GetXaxis()->SetTitle("ToT / ns");
-    
-    cLos->cd(1);
-    fh_los_channels->Draw();
-    cLos->cd(3);
-    fh_los_tres_MCFD->Draw();
-    cLos->cd(4);
-    fh_los_tres_TAMEX->Draw();
-    cLos->cd(5);    
-    fh_los_pos->Draw("colZ");
-    cLos->cd(6);
-    fh_los_tot->Draw();
-    cLos->cd(0);
-    run->AddObject(cLos);
-    
     
 //-----------------------------------------------------------------------
 // Califa detector
@@ -588,65 +588,68 @@ InitStatus R3BOnlineSpectra::Init()
     //get access to Cal data
     fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
 
-		//reading the file    
-		ifstream *FileHistos = new ifstream(fCalifaFile);
-
-		Double_t arry_bins[fCalifaNumPetals*64+1];
-		Double_t arry_maxE[fCalifaNumPetals*64+1];
-		Double_t arry_minE[fCalifaNumPetals*64+1];
-		Double_t bins;
-		Double_t maxE;
-		Double_t minE;
-
-		for (Int_t i=0; i<fCalifaNumPetals*64+1; i++){
-				*FileHistos>>arry_bins[i]>>arry_maxE[i]>>arry_minE[i];		
-		}
 		
-		bins= arry_bins[fCalifaNumPetals*64];//the last is the general setting
-		maxE= arry_maxE[fCalifaNumPetals*64];
-		minE= arry_minE[fCalifaNumPetals*64];
-
     if(fMappedItemsCalifa || fCalItemsCalifa){  
       
+			//saving histos
+			TFile *MyFile = new TFile("hist.root","RECREATE"); 
+		 	if ( MyFile->IsOpen() ) cout << "File opened successfully" << endl;
+
+			//reading the file    
+			ifstream *FileHistos = new ifstream(fCalifaFile);
+
+			Double_t arry_bins[fCalifaNumPetals*64+1];
+			Double_t arry_maxE[fCalifaNumPetals*64+1];
+			Double_t arry_minE[fCalifaNumPetals*64+1];
+			Double_t bins;
+			Double_t maxE;
+			Double_t minE;
+
+			for (Int_t i=0; i<fCalifaNumPetals*64+1; i++){
+					*FileHistos>>arry_bins[i]>>arry_maxE[i]>>arry_minE[i];	
+					std::cout<<"i="<<i<<" "<<arry_bins[i]<<" "<<arry_maxE[i]<<" "<<arry_minE[i]<<endl;//READ ok!	
+			}
+		
+			bins= arry_bins[fCalifaNumPetals*64];//the last line is a general setting
+			maxE= arry_maxE[fCalifaNumPetals*64];
+			minE= arry_minE[fCalifaNumPetals*64];
+
 			//--------------------------------------------------------------ok
-      fh_Califa_cryId_petal = new TH2F("fh_Califa_cryId_petal", "Califa petal number vs cryId", 65, 0, 65, 17, 0, 17);    
-      TCanvas *cCalifa1 = new TCanvas("cCalifa1", "Califa petal_num vs cryId", 10, 10, 500, 500);
+      fh_Califa_cryId_petal = new TH2F("fh_Califa_cryId_petal", "Califa petal number vs cryId", 64, 0, 63, 8, 0, 7);    
+      TCanvas *cCalifa1 = new TCanvas("Califa petal vs cryId", "Califa petal vs cryId", 10, 10, 500, 500);
       fh_Califa_cryId_petal->Draw("colz");
       fh_Califa_cryId_petal->GetXaxis()->SetTitle("CrystalId");
       fh_Califa_cryId_petal->GetYaxis()->SetTitle("Petal number");
       run->AddObject(cCalifa1);
-      
+      fh_Califa_cryId_petal->Write();//writing TFile
 
 
 			//----------------------------  ok
 			TString Name1;
 			TString Name2; 
 			TString Name3; 
+			TString Yaxis1; 
 			if(fCalON==true){
-				//sprintf(Name1,"fh_Califa_%d_cryId_energy","Cal");
-				//sprintf(Name2,"Califa %d energy vs cryId","Cal"); 			 
-				//sprintf(Name3,"Califa_%d energy vs cryId","Cal"); 
 				Name1="fh_Califa_Cal_cryId_energy";
 				Name2="Califa_Cal energy vs cryId";
 				Name3="Califa_Cal energy vs cryId";
+				Yaxis1="Energy (keV)";
 			}
 			else{	
-				//sprintf(Name1,"fh_Califa_%d_cryId_energy","Map"); 
-				//sprintf(Name1,"Califa %d energy vs cryId","Map");  
-				//sprintf(Name3,"Califa_%d energy vs cryId","Map");
 				Name1="fh_Califa_Map_cryId_energy";
 				Name2="Califa_Map energy vs cryId";
 				Name3="Califa_Map energy vs cryId";
+				Yaxis1="Energy (channels)";
 			}
       
-			fh_Califa_cryId_energy = new TH2F(Name1, Name2, 1024, 0., 1024, bins, minE, maxE);
-
-      TCanvas *cCalifa2 = new TCanvas("cCalifa2", Name3, 10, 10, 500, 500);
+			fh_Califa_cryId_energy = new TH2F(Name1, Name2, 64*fCalifaNumPetals, 0., 64*fCalifaNumPetals-1, bins, minE, maxE);
+		
+      TCanvas *cCalifa2 = new TCanvas(Name3, Name3, 10, 10, 500, 500);
       fh_Califa_cryId_energy->Draw("colz");
       fh_Califa_cryId_energy->GetXaxis()->SetTitle("CrystalId");
-      fh_Califa_cryId_energy->GetYaxis()->SetTitle("Energy");
+      fh_Califa_cryId_energy->GetYaxis()->SetTitle(Yaxis1);
       run->AddObject(cCalifa2);
-
+			fh_Califa_cryId_energy->Write();//writing TFile
     
       //------------------------------------------------------------- ok
       TCanvas* cCalifa3[fCalifaNumPetals][4];		
@@ -656,26 +659,29 @@ InitStatus R3BOnlineSpectra::Init()
 
 					char Name4[255];
 					sprintf(Name4, "Califa Petal %d.%d", i+1,k+1);
-					cCalifa3[i][k] = new TCanvas("cCalifa3", Name4, 10, 10, 500, 500);
+					cCalifa3[i][k] = new TCanvas(Name4, Name4, 10, 10, 500, 500);
 					cCalifa3[i][k]->Divide(4,4);
 
 					for(Int_t j=0; j<16;j++){
 
 						char Name5[255];
 						char Name6[255];
+						TString Xaxis1;
 						if (fCalON==true){	    				
 							sprintf(Name5, "h_Califa_Cal_Petal_%d_%d_Crystal_%d_energy", i+1, k+1, j+1);		  
 							sprintf(Name6, "Califa_Cal Petal %d.%d Crystal %d energy", i+1,k+1, j+1); //cryId 1-16
+							Xaxis1="Energy (keV)";
 						}
 						else{
 							sprintf(Name5, "h_Califa_Map_Petal_%d_%d_Crystal_%d_energy", i+1, k+1, j+1);		  
 							sprintf(Name6, "Califa_Map Petal %d.%d Crystal %d energy", i+1,k+1, j+1); //cryId 1-16
+							Xaxis1="Energy (channels)";
 						}
 						fh_Califa_crystals[i][j+16*k] = new TH1F(Name5, Name6, arry_bins[j+16*k], arry_minE[j+16*k], arry_maxE[j+16*k]);
 						cCalifa3[i][k]->cd(j+1);
 						fh_Califa_crystals[i][j+16*k]->Draw();
-						fh_Califa_crystals[i][j+16*k]->GetXaxis()->SetTitle("Energy");
-						
+						fh_Califa_crystals[i][j+16*k]->GetXaxis()->SetTitle(Xaxis1);
+						fh_Califa_crystals[i][j+16*k]->Write();//writing TFile
 					}
 					run->AddObject(cCalifa3[i][k]);
 				}
@@ -689,24 +695,28 @@ InitStatus R3BOnlineSpectra::Init()
 						char Name7[255];
 						char Name8[255];
 						char Name9[255];
+						TString Xaxis2;
 	
 						if (fCalON==true){	    				
 							sprintf(Name7, "h_Califa_Cal_energy_per_petal_%d", i+1);	  
-							sprintf(Name8, "Califa_Cal Energy per Petal %d", i+1);
+							sprintf(Name8, "Califa_Cal Energy per petal %d", i+1);
 							sprintf(Name9, "Califa_Cal Energy petal %d", i+1);
+							Xaxis2="Energy (keV)";
 						}
 						else{
 							sprintf(Name7, "h_Califa_Map_energy_per_petal_%d", i+1);	  
-							sprintf(Name8, "Califa_Map Energy per Petal %d", i+1);
+							sprintf(Name8, "Califa_Map Energy per petal %d", i+1);
 							sprintf(Name9, "Califa_Map Energy petal %d", i+1);
+							Xaxis2="Energy (channels)";
 						}
 
 					fh_Califa_energy_per_petal[i] = new TH1F(Name7, Name8, bins, minE, maxE);
 					
-					cCalifa5[i] = new TCanvas("cCalifa5", Name9, 10, 10, 500, 500);
+					cCalifa5[i] = new TCanvas(Name9, Name9, 10, 10, 500, 500);
 					fh_Califa_energy_per_petal[i]->Draw();
-					fh_Califa_energy_per_petal[i]->GetXaxis()->SetTitle("Energy (chn)");
+					fh_Califa_energy_per_petal[i]->GetXaxis()->SetTitle(Xaxis2);
 					run->AddObject(cCalifa5[i]);
+					fh_Califa_energy_per_petal[i]->Write();//writing TFile
       }
 
 			//--------------------------------------------------  ok!
@@ -715,33 +725,34 @@ InitStatus R3BOnlineSpectra::Init()
 				TString Name10;
 				TString Name11;
 				TString Name12;
+				TString Xaxis3;
+
+				cout<<"OneCrystal="<<fCalifaOneCrystal<<endl;
 
 				if (fCalON==true){	    				
-					//sprintf(Name10,"fh_Califa_%d_energy_oneCry", "Cal");		  
-					//sprintf(Name11,"Califa_%d energy for OneCrystal", "Cal");
-					//sprintf(Name12,"Califa_%d OneCrystal Energy", "Cal");
 					Name10="fh_Califa_Cal_energy_oneCry";		  
 					Name11="Califa_Cal energy for OneCrystal";
 					Name12="Califa_Cal OneCrystal Energy";
+					Xaxis3="Energy (keV)";
 				}
 				else{
-					//sprintf(Name10,"fh_Califa_%d_energy_oneCry", "Map");		  
-					//sprintf(Name11,"Califa_%d energy for OneCrystal", "Map");
-					//sprintf(Name12,"Califa_%d OneCrystal Energy", "Map");
 					Name10="fh_Califa_Map_energy_oneCry";		  
 					Name11="Califa_Map energy for OneCrystal";
 					Name12="Califa_Map OneCrystal Energy";
+					Xaxis3="Energy (channels)";
 				}
 
-					fh_Califa_energy_oneCry = new TH1F(Name10, Name11, arry_bins[fCalifaOneCrystal], arry_minE[fCalifaOneCrystal], arry_maxE[fCalifaOneCrystal]);
+					fh_Califa_energy_oneCry = new TH1F(Name10, Name11, arry_bins[fCalifaOneCrystal-1], arry_minE[fCalifaOneCrystal-1], arry_maxE[fCalifaOneCrystal-1]);
 	
-					TCanvas *cCalifa4 = new TCanvas("cCalifa4", Name12, 10, 10, 500, 500);
+					TCanvas *cCalifa4 = new TCanvas(Name12, Name12, 10, 10, 500, 500);
 					fh_Califa_energy_oneCry->Draw();
-					fh_Califa_energy_oneCry->GetXaxis()->SetTitle("Energy");
+					fh_Califa_energy_oneCry->GetXaxis()->SetTitle(Xaxis3);
 					run->AddObject(cCalifa4);
+					fh_Califa_energy_oneCry->Write();//writing TFile
       }
-
-
+	
+			MyFile->Print();
+			MyFile->Close();
     }//--------------------		
     
     return kSUCCESS;
@@ -1530,19 +1541,32 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	       R3BCalifaMappedData* hit = (R3BCalifaMappedData*)fMappedItemsCalifa->At(ihit);
 	       if (!hit) continue;
 	       
-	       fh_Califa_cryId_energy->Fill(hit->GetCrystalId(),hit->GetEnergy());  
+	        
 	       if (hit->GetCrystalId()==fCalifaOneCrystal){fh_Califa_energy_oneCry->Fill(hit->GetEnergy());}
 	       
 	       Int_t cryId;				
 	       Int_t petal;
 	       Int_t cryId_petal;
+
+/*
+
+  
+  cryId=hit->GetCrystalId()-1;
+        petal=(Int_t)(cryId)/64;//from 1 to 8
+        cryId_petal=cryId-64*(petal);//from 1 to 64
+         fh_Califa_energy_per_petal[petal]->Fill(hit->GetEnergy());//energy(channels) sum for each petal 
+
+
+
+*/
 	       
-	       cryId=hit->GetCrystalId();
-	       petal=(Int_t)cryId/64 +1;//from 1 to 8
-	       cryId_petal=cryId-64*(petal-1);//from 1 to 64
+	       cryId=hit->GetCrystalId()-1;
+	       petal=(Int_t)cryId/64;//from 0 to 7
+	       cryId_petal=cryId-64*(petal);//from 0 to 63
 	       
+ 				 fh_Califa_cryId_energy->Fill(cryId,hit->GetEnergy());
 	       fh_Califa_crystals [petal][cryId_petal]->Fill(hit->GetEnergy());//individual energy histo for each crystalId
-	       fh_Califa_energy_per_petal[petal-1]->Fill(hit->GetEnergy());//energy(channels) sum for each petal 
+	       fh_Califa_energy_per_petal[petal]->Fill(hit->GetEnergy());//energy(channels) sum for each petal 
 	       fh_Califa_cryId_petal->Fill(cryId_petal, petal);//crystalId vs petal number 
 	     }
 	 }

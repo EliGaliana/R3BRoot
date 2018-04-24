@@ -168,7 +168,7 @@ class R3BOnlineSpectra : public FairTask
       fCalifaOneCrystal = onecry;
     }
     
-    inline void ChooseCalifaFile(TString file){fCalifaFile=file;}
+    inline void SetCalifaConfigFile(TString file){fCalifaFile=file;}
     
     inline void SetDisplayCalOn(Bool_t On){fCalON=On;}
     
