@@ -76,7 +76,7 @@ void califa_febex3_ucesb() {
 	//SetDisplayCalOn(Bool_t On){fCalON=On;}
 	
 	//R3BOnlineSpectra ---
-	Bool_t ON=false;
+	Bool_t ON=true;
 	Int_t petals=8;
 	Int_t crystalId=462;
 	
