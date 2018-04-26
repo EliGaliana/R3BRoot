@@ -41,6 +41,7 @@
 #include <sstream>
 #include "TMath.h"
 #include <stdbool.h>
+#include "TStyle.h"
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
@@ -602,8 +603,8 @@ InitStatus R3BOnlineSpectra::Init()
       Double_t minE;
       
       for (Int_t i=0; i<fCalifaNumPetals*64+1; i++){
-				*FileHistos>>arry_bins[i]>>arry_maxE[i]>>arry_minE[i];	
-				//std::cout<<"i="<<i<<" "<<arry_bins[i]<<" "<<arry_maxE[i]<<" "<<arry_minE[i]<<endl;//READ ok!	
+				*FileHistos>>arry_bins[i]>>arry_minE[i]>>arry_maxE[i];	
+				std::cout<<"i="<<i<<" "<<arry_bins[i]<<" "<<arry_minE[i]<<" "<<arry_maxE[i]<<endl;//READ ok!	
       }
       
       bins= arry_bins[fCalifaNumPetals*64];//the last line is a general setting
@@ -640,7 +641,7 @@ InitStatus R3BOnlineSpectra::Init()
       }
       
       fh_Califa_cryId_energy = new TH2F(Name1, Name2, 64*fCalifaNumPetals, 0., 64*fCalifaNumPetals-1, bins, minE, maxE);
-      
+			
       TCanvas *cCalifa2 = new TCanvas(Name3, Name3, 10, 10, 500, 500);
       fh_Califa_cryId_energy->Draw("COLZ");
       fh_Califa_cryId_energy->GetXaxis()->SetTitle("CrystalId");
@@ -735,7 +736,7 @@ InitStatus R3BOnlineSpectra::Init()
 				}
 	
 				fh_Califa_energy_oneCry = new TH1F(Name10, Name11, arry_bins[fCalifaOneCrystal-1], arry_minE[fCalifaOneCrystal-1], arry_maxE[fCalifaOneCrystal-1]);
-	
+
 				TCanvas *cCalifa5 = new TCanvas(Name12, Name12, 10, 10, 500, 500);
 				fh_Califa_energy_oneCry->Draw();
 				fh_Califa_energy_oneCry->GetXaxis()->SetTitle(Xaxis3);
@@ -1581,7 +1582,11 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
 void R3BOnlineSpectra::FinishEvent()
 {
-  
+		// CALIFA
+		//fh_Califa_cryId_petal->Draw("COLZ");
+    //fh_Califa_cryId_energy->Draw("COLZ");
+	  //fh_Califa_energy_oneCry->Draw();  
+		
     if (fCalItemsLos)
       {
         fCalItemsLos->Clear();
@@ -1664,6 +1669,14 @@ void R3BOnlineSpectra::FinishTask()
     fh_Fi6_ToTvsTime->Write();
   }
 	if (fMappedItemsCalifa || fCalItemsCalifa){
+
+
+			// CALIFA
+      //fh_Califa_cryId_petal->Draw("COLZ");
+      //fh_Califa_cryId_energy->Draw("COLZ");
+			//fh_Califa_energy_oneCry->Draw();
+
+			//------------
 			TFile *MyFile = new TFile("hist.root","RECREATE"); 
 			if ( MyFile->IsOpen() ) cout << "File opened successfully"<<endl;
 			fh_Califa_cryId_petal->Write();
