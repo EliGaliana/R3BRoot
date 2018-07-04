@@ -1,4 +1,4 @@
-void runsim(Int_t nEvents = 10)
+void runsim(Int_t nEvents = 5)
 {
 
   // =========== Configuration area =============================

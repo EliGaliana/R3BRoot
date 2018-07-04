@@ -8,10 +8,15 @@
 #include <TMath.h>
 #include <TVector3.h>
 #include <TGeoNavigator.h>
-
 #include <FairLogger.h>
-
 #include "R3BCalifaGeometry.h"
+
+#include <iostream>
+#include <stdlib.h>
+
+using std::cout;
+using std::cerr;
+using std::endl;
 
 //R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
@@ -84,7 +89,7 @@
   fNavigator = new TGeoNavigator(gGeoManager);
 }*/
 
-void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, 
+void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, //Working & Chack it the last time
 				 Double_t & azimuthal, Double_t & rho)
 {
 
@@ -95,35 +100,53 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar,
   Int_t alveolusCopy =0;
   Int_t crystalInAlveolus=0;
 
-    //The present scheme here done works with 8.11
-    // crystalType = alveolus type (from 1 to 16) [Alveolus number]
-    // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)
-    // crystalId = 1 to 32 for the first 32 crystals 
-    //                     (single crystal in each alveoli)
-    // or 32 + (alveolus type-2)*128 + (alvelous copy)*4 + (crystal copy) + 1
-    //                     (from 1 to 1952)
-    //
     Char_t nameVolume[200];
-    if (iD<3000) {
-      if(iD<33) crystalType = 1;  //Alv type 1
-      else crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)
-      if(iD<33) crystalCopy = iD;     //for Alv type 1 
-      else crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
-      if(iD<33) alveolusCopy = iD;    //Alv type 1 
-      else alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
-      if(iD<33) crystalInAlveolus =1;          //Alv type 1
-      else crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
-    
+		/*BARREL
+		// First ring (single crystals)
+						crystalType = 1;  //Alv type 1
+						crystalCopy = iD;     //for Alv type 1 
+						alveolusCopy = iD;    //Alv type 1 
+						crystalInAlveolus =1;          //Alv type 1
+								
+		// Ring 2 - 16: 2x2 crystals
+						Alv type or crystalType(2 to 16)
+						CrystalCopy (1 to 128)
+						Alveolus copy (1 to 32)
+						Crystal number in alveolus (1 to 4)*/
+   if (iD >= 1 && iD <= 1952) {
+      if(iD<33)
+      {// First ring (single crystals)
+        crystalType = 1;  //Alv type 1
+        crystalCopy = iD; 
+        alveolusCopy = iD;
+        crystalInAlveolus =1;
+      }
+      else
+      {// Ring 2 - 16: 2x2 crystals
+        crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)	
+        crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
+        alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
+        crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
+      }
       Int_t alveoliType[16]={1,2,2,2,2,3,3,4,4,4,5,5,5,6,6,6};
-    
+   
       sprintf(nameVolume, 
 	      "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i/Crystal_%i_%i_1",
 	      crystalType, alveolusCopy-1, 
 	      crystalType, alveoliType[crystalType-1], 
 	      crystalInAlveolus, crystalInAlveolus-1, 
 	      alveoliType[crystalType-1], crystalInAlveolus);
-    
-      // The definition of the crystals is different in this particular EndCap design:         CHECK THIS with the new Geo!!
+
+//cout<<">>> CALIFA Geometry: ------ GetAngles ------"<<endl;
+//cout<<"iD= "<<iD<<endl;
+//cout<<"crystalType=1 or (Int_t)((iD-33)/128) + 2    ->"<<crystalType<<endl;
+//cout<<"crystalCopy=iD or ((iD-33)%128) + 1;     ->"<<crystalCopy<<endl;
+//cout<<"alveolusCopy=iD or (Int_t)(((iD-33)%128)/4) +1   ->"<<alveolusCopy<<endl;
+//cout<<"crystalInAlveolus=1 or (iD-33)%4 + 1     ->"<<crystalInAlveolus<<endl;
+//cout<<"nameVolume= "<<nameVolume<<endl<<endl;
+//------------------------------------------------------------------------------------------------------   
+// CHECK THIS with the new Geo!!
+      // The definition of the crystals is different in this particular EndCap design:         
       // the origin for each crystal is the alveoli corner
       if (crystalType==1) {
 	local[0]=27.108/8; local[1]=-28.0483/8; local[2]=0;
@@ -179,30 +202,39 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar,
 	  local[0]=9.07247/8; local[1]=-4.66458/8; local[2]=0;
 	}
       }		
-
+//------------------------------------------------------------------------------------------------------
       gGeoManager->CdTop();
 
       if(gGeoManager->CheckPath(nameVolume)) gGeoManager->cd(nameVolume);
       else { 
-	LOG(ERROR) << "R3BCalifaCrysta2Hit: Invalid crystal path: " << nameVolume
+	LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal path: " << nameVolume
 		   << FairLogger::endl;
 	return; 
       }
       gGeoManager->LocalToMaster(local, master);
 
     } else{
-      //For CC iPhos+phoswich endcap
-      crystalType = ((iD - 3000) % 24) + 1;
-      crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1;
+		/*EndCap Volumes Info:		    
+				crystalType from 1 to 24
+				crystalCopy from 1 to 32
+				crystalId from 3000 to 3767
+		*/
+
+      crystalType = ((iD - 3000) % 24) + 1; //from 1 to 24
+      crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1;//from 1 to 32
       Int_t alveoliType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
-      //Int_t alveoliType[24]={1,2,3,4,0,0,0,0,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
       Int_t wrappingType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-      //Char_t nameVolume[200];
 
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
-              alveoliType[crystalType-1], crystalCopy-1, wrappingType[crystalType-1], crystalType);
+								      alveoliType[crystalType-1], crystalCopy-1, wrappingType[crystalType-1], crystalType);
       gGeoManager->cd(nameVolume);
       gGeoManager->LocalToMaster(local, master);
+//cout<<"CALIFA Geometry iD= "<<iD<<endl;
+//cout<<"crystalType=((iD - 3000) % 24) + 1   ->"<<crystalType<<endl;
+//cout<<"crystalCopy=(iD-3000 - crystalType + 1) / 24 + 1     ->"<<crystalCopy<<endl;
+//cout<<"alveoliType[crystalType-1   ->"<<alveoliType[crystalType-1]<<endl;
+//cout<<"wrappingType[crystalType-1]    ->"<<wrappingType[crystalType-1]<<endl;
+//cout<<"nameVolume= "<<nameVolume<<endl<<endl;
     }
     
   TVector3 masterV(master[0],master[1],master[2]);
@@ -210,6 +242,7 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar,
   polar=masterV.Theta();
   azimuthal=masterV.Phi();
   rho=masterV.Mag();
+//cout<<"CALIFA Geometry: "<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
 }
 
 const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //funciona falta comprobar el crystalid
@@ -257,20 +290,19 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //funciona falta com
       crystalType = ((iD - 3000) % 24) + 1;  //crystalType (1 to 24)      										OK!
       crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1;//crystalCopy (1 to 32)  						 OK!
       Int_t alveoliType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};			//OK
-      //Int_t alveoliType[24]={1,2,3,4,0,0,0,0,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
       Int_t wrappingType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};			//OK
-      //Char_t nameVolume[200];
-
+     
       nameVolume = TString::Format("/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
               alveoliType[crystalType-1], crystalCopy-1, wrappingType[crystalType-1], crystalType);
 
     }
     else
     {
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal ID " << iD << " for geometry version 17" << FairLogger::endl;
+      LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal ID " << iD << FairLogger::endl;
       return NULL;
     }
-
+cout<<"CALIFA Geometry iD= "<<iD<<endl;
+cout<<"nameVolume= "<<nameVolume<<endl<<endl;
 
   return nameVolume.Data();
 }

@@ -192,8 +192,8 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
             sCrystalInfo tmpInfo;
             memset(&tmpInfo, 0, sizeof(sCrystalInfo));//Fill by 0 sCrystalInfo 
 
-//:GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho)
-						R3BCalifaGeometry* CalifaGeo;
+
+						/*R3BCalifaGeometry* CalifaGeo;
 						const char* path;
 						int id;
 						id=32;
@@ -202,9 +202,10 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 						Double_t rho;
 						
 						path=CalifaGeo->GetCrystalVolumePath(id);
-						cout<<"    HEREEEEE!  path="<<path<<endl<<endl;
+						cout<<"    HEREEEEE!  path="<<path<<endl;
 
 						CalifaGeo->GetAngles(id, polar, azimuthal, rho);
+						cout<<"id="<<id<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;*/
 
             if (GetCrystalInfo(tmpInfo))
             {
@@ -467,9 +468,10 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
     info.cpCry = cpCry;
 
     
-    bool Print_Cryinfo=kFALSE;
+    bool Print_Cryinfo=kTRUE;
     if(Print_Cryinfo)
     {
+			cout<<">>> CALIFA main class <<<"<<endl;
 		  cout<<"-------   Crystal info   ------"<<endl;	
 		  cout<<"-- from gMC"<<endl;
 		  cout<<"Path= "<<gMC->CurrentVolPath()<<endl;	
@@ -631,6 +633,23 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 16." << FairLogger::endl;
             return kFALSE;
         }
+
+
+
+						R3BCalifaGeometry* CalifaGeo;
+						const char* path;					
+ 						Double_t polar;
+						Double_t azimuthal;
+						Double_t rho;
+
+						//GetAngles
+						//CalifaGeo->GetAngles(info.crystalId, polar, azimuthal, rho);
+						//cout<<"CALIFA main: info.crystalId="<<info.crystalId<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
+
+						//GetPath
+						path=CalifaGeo->GetCrystalVolumePath(info.crystalId);
+						cout<<"CALIFA main: info.crystalId="<<info.crystalId<<endl;
+						cout<<"CALIFA main: path="<<path<<endl<<endl<<endl<<endl;
 
    return kTRUE;
  
