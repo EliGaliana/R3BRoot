@@ -13,9 +13,9 @@
 
 #include "R3BCalifaGeometry.h"
 
-R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
+//R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
-R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
+/*R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
 {
   if(!inst)
     inst = new R3BCalifaGeometry(version);
@@ -28,9 +28,9 @@ R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
   }
 
   return inst;
-}
+}*/
 
-R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), fNavigator(NULL)
+/*R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), fNavigator(NULL)
 {
   LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version << FairLogger::endl;
 
@@ -82,10 +82,10 @@ R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), 
   gGeoManager->SetTopVolume(v);
 
   fNavigator = new TGeoNavigator(gGeoManager);
-}
+}*/
 
-void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar, 
-				 Double_t* azimuthal, Double_t* rho)
+void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, 
+				 Double_t & azimuthal, Double_t & rho)
 {
 
   Double_t local[3]={0,0,0};
@@ -95,7 +95,6 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
   Int_t alveolusCopy =0;
   Int_t crystalInAlveolus=0;
 
- if (fGeometryVersion==16) {
     //The present scheme here done works with 8.11
     // crystalType = alveolus type (from 1 to 16) [Alveolus number]
     // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)
@@ -124,7 +123,7 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
 	      crystalInAlveolus, crystalInAlveolus-1, 
 	      alveoliType[crystalType-1], crystalInAlveolus);
     
-      // The definition of the crystals is different in this particular EndCap design:
+      // The definition of the crystals is different in this particular EndCap design:         CHECK THIS with the new Geo!!
       // the origin for each crystal is the alveoli corner
       if (crystalType==1) {
 	local[0]=27.108/8; local[1]=-28.0483/8; local[2]=0;
@@ -205,43 +204,18 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
       gGeoManager->cd(nameVolume);
       gGeoManager->LocalToMaster(local, master);
     }
-  }
-  else if(fGeometryVersion == 17 || fGeometryVersion == 0x438b)
-  {
-    const char *nameVolume = GetCrystalVolumePath(iD);
-    if(!nameVolume)
-      return;
-
-    if(!gGeoManager->cd(nameVolume))
-    {
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid volume path: " << nameVolume << FairLogger::endl;
-      return;
-    }
-
-    // TGeoManager::LocalToMaster does the whole magic:
-    // Local to Master transformation along the whole geometry tree up to the top volume
-    // Note: Requires the crystal centers (reference point) to be at (0,0,0) in local coordinates
-    gGeoManager->LocalToMaster(local, master);
-
-  }
- else
- {
-   LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetAngles(). " << FairLogger::endl;
-   return;
- }
-  
-  
+    
   TVector3 masterV(master[0],master[1],master[2]);
   //masterV.Print();
-  *polar=masterV.Theta();
-  *azimuthal=masterV.Phi();
-  *rho=masterV.Mag();
+  polar=masterV.Theta();
+  azimuthal=masterV.Phi();
+  rho=masterV.Mag();
 }
 
-const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)
+const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //funciona falta comprobar el crystalid
 {
   // Must be static since function returns string
-  // owned by nameVolume, wich must not be destroyed
+  // owned by nameVolume, which must not be destroyed
   static TString nameVolume;
 
   Int_t crystalType = 0;
@@ -249,12 +223,6 @@ const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)
   Int_t alveolusCopy =0;
   Int_t crystalInAlveolus=0;
 
-
-  switch(fGeometryVersion)
-  {
-    case 16:
-    case 17:
-    case 0x438b:
     if (iD >= 1 && iD <= 1952)
     {
       // Barrel
@@ -302,12 +270,7 @@ const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)
       LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal ID " << iD << " for geometry version 17" << FairLogger::endl;
       return NULL;
     }
-    break;
 
-    default:
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid geometry version for GetCrystalVolumePath()" << FairLogger::endl;
-      return NULL;
-  }
 
   return nameVolume.Data();
 }
@@ -370,14 +333,11 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 
   int crystalId = -1;
 
-  for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())			//?¿
+  for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())
   {
     volumeNames.push_back(n->GetName());
     nodeCopies.push_back(n->GetNumber());
   }
-
-  if (fGeometryVersion==16 || fGeometryVersion==17 || fGeometryVersion==0x438b) {
-    //RESERVED FOR CALIFA 8.11 BARREL + CC 0.2
     
     if(volumeNames.size() < 4)
     {
@@ -447,13 +407,6 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 		      << FairLogger::endl;
       return -1;
     }
-  }
-  else
-  {
-    LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetCrystalId(). " 
-		    << FairLogger::endl;
-    return -1;
-  }
 
   return crystalId;
 }

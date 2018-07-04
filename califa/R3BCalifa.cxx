@@ -191,6 +191,21 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
             // Not found in map => Create crystal information for crystal
             sCrystalInfo tmpInfo;
             memset(&tmpInfo, 0, sizeof(sCrystalInfo));//Fill by 0 sCrystalInfo 
+
+//:GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho)
+						R3BCalifaGeometry* CalifaGeo;
+						const char* path;
+						int id;
+						id=32;
+ 						Double_t polar;
+						Double_t azimuthal;
+						Double_t rho;
+						
+						path=CalifaGeo->GetCrystalVolumePath(id);
+						cout<<"    HEREEEEE!  path="<<path<<endl<<endl;
+
+						CalifaGeo->GetAngles(id, polar, azimuthal, rho);
+
             if (GetCrystalInfo(tmpInfo))
             {
                 fCrystal = &(fCrystalMap[nodeId] = tmpInfo);
