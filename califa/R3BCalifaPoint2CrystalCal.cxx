@@ -30,8 +30,7 @@ R3BCalifaPoint2CrystalCal::R3BCalifaPoint2CrystalCal() : FairTask("R3B CALIFA Po
 R3BCalifaPoint2CrystalCal::R3BCalifaPoint2CrystalCal(const TString& geoFile) : FairTask("R3B CALIFA Point2CrystalCal"),
 								 fCalifaPointDataCA(NULL),
 								 fCalifaCryCalDataCA(NULL),
-	 							 fNonUniformity(0),
-								 fGeometryVersion(1) {
+	 							 fNonUniformity(0) {
 }
 
 //Virtual R3BCalifaPoint2CrystalCal: Destructor

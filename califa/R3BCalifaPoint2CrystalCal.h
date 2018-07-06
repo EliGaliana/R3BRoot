@@ -49,10 +49,9 @@ class R3BCalifaPoint2CrystalCal : public FairTask
  /** Virtual method FinishEvent **/
  virtual void FinishEvent();
    
- //Accessors functions  ?¿ 
+ //Accessors functions 
  void SetEnergyResolution(Double_t resolution){fResolution=resolution;}
- void SetGeometryVersion(Double_t version){fGeometryVersion=version;}
- 
+
   inline void ResetParameters()
 	{
 	};
@@ -76,7 +75,6 @@ class R3BCalifaPoint2CrystalCal : public FairTask
   private:
       
     Int_t fResolution;  						//Resolution of the CALIFA calorimeter
-    Int_t fGeometryVersion; 				//Selecting the geometry of the CALIFA calorimeter
 		Double_t fNonUniformity;				//Adding some non-uniformity preliminary description
 		
 		
