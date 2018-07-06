@@ -25,7 +25,7 @@ protected:
 
     //int fGeometryVersion;
 
-    TGeoNavigator *fNavigator;
+    //TGeoNavigator *fNavigator;
 
 public:
   /**

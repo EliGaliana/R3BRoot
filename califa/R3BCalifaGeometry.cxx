@@ -89,7 +89,7 @@ using std::endl;
   fNavigator = new TGeoNavigator(gGeoManager);
 }*/
 
-void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, //Working & Chack it the last time
+void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, //Working 
 				 Double_t & azimuthal, Double_t & rho)
 {
 
@@ -137,13 +137,13 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, //Working & Chack 
 	      crystalInAlveolus, crystalInAlveolus-1, 
 	      alveoliType[crystalType-1], crystalInAlveolus);
 
-//cout<<">>> CALIFA Geometry: ------ GetAngles ------"<<endl;
-//cout<<"iD= "<<iD<<endl;
-//cout<<"crystalType=1 or (Int_t)((iD-33)/128) + 2    ->"<<crystalType<<endl;
-//cout<<"crystalCopy=iD or ((iD-33)%128) + 1;     ->"<<crystalCopy<<endl;
-//cout<<"alveolusCopy=iD or (Int_t)(((iD-33)%128)/4) +1   ->"<<alveolusCopy<<endl;
-//cout<<"crystalInAlveolus=1 or (iD-33)%4 + 1     ->"<<crystalInAlveolus<<endl;
-//cout<<"nameVolume= "<<nameVolume<<endl<<endl;
+				//cout<<">>> CALIFA Geometry: ------ GetAngles ------"<<endl;
+				//cout<<"iD= "<<iD<<endl;
+				//cout<<"crystalType=1 or (Int_t)((iD-33)/128) + 2    ->"<<crystalType<<endl;
+				//cout<<"crystalCopy=iD or ((iD-33)%128) + 1;     ->"<<crystalCopy<<endl;
+				//cout<<"alveolusCopy=iD or (Int_t)(((iD-33)%128)/4) +1   ->"<<alveolusCopy<<endl;
+				//cout<<"crystalInAlveolus=1 or (iD-33)%4 + 1     ->"<<crystalInAlveolus<<endl;
+				//cout<<"nameVolume= "<<nameVolume<<endl<<endl;
 //------------------------------------------------------------------------------------------------------   
 // CHECK THIS with the new Geo!!
       // The definition of the crystals is different in this particular EndCap design:         
@@ -214,7 +214,7 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, //Working & Chack 
       gGeoManager->LocalToMaster(local, master);
 
     } else{
-		/*EndCap Volumes Info:		    
+		/*ENDCAP Volumes Info:		    
 				crystalType from 1 to 24
 				crystalCopy from 1 to 32
 				crystalId from 3000 to 3767
@@ -229,23 +229,23 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t & polar, //Working & Chack 
 								      alveoliType[crystalType-1], crystalCopy-1, wrappingType[crystalType-1], crystalType);
       gGeoManager->cd(nameVolume);
       gGeoManager->LocalToMaster(local, master);
-//cout<<"CALIFA Geometry iD= "<<iD<<endl;
-//cout<<"crystalType=((iD - 3000) % 24) + 1   ->"<<crystalType<<endl;
-//cout<<"crystalCopy=(iD-3000 - crystalType + 1) / 24 + 1     ->"<<crystalCopy<<endl;
-//cout<<"alveoliType[crystalType-1   ->"<<alveoliType[crystalType-1]<<endl;
-//cout<<"wrappingType[crystalType-1]    ->"<<wrappingType[crystalType-1]<<endl;
-//cout<<"nameVolume= "<<nameVolume<<endl<<endl;
+			//cout<<"CALIFA Geometry iD= "<<iD<<endl;
+			//cout<<"crystalType=((iD - 3000) % 24) + 1   ->"<<crystalType<<endl;
+			//cout<<"crystalCopy=(iD-3000 - crystalType + 1) / 24 + 1     ->"<<crystalCopy<<endl;
+			//cout<<"alveoliType[crystalType-1   ->"<<alveoliType[crystalType-1]<<endl;
+			//cout<<"wrappingType[crystalType-1]    ->"<<wrappingType[crystalType-1]<<endl;
+			//cout<<"nameVolume= "<<nameVolume<<endl<<endl;
     }
     
-  TVector3 masterV(master[0],master[1],master[2]);
-  //masterV.Print();
-  polar=masterV.Theta();
-  azimuthal=masterV.Phi();
-  rho=masterV.Mag();
-//cout<<"CALIFA Geometry: "<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
+		TVector3 masterV(master[0],master[1],master[2]);
+		//masterV.Print();
+		polar=masterV.Theta();
+		azimuthal=masterV.Phi();
+		rho=masterV.Mag();
+		//cout<<"CALIFA Geometry: "<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
 }
 
-const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //funciona falta comprobar el crystalid
+const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //WORKING
 {
   // Must be static since function returns string
   // owned by nameVolume, which must not be destroyed
@@ -270,7 +270,7 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //funciona falta com
       else
       {
         // Ring 2 - 16: 2x2 crystals
-        crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)													OK! revisar una ultima vez
+        crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)	       OK! 
         crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
         alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
         crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
@@ -301,24 +301,29 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //funciona falta com
       LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal ID " << iD << FairLogger::endl;
       return NULL;
     }
-cout<<"CALIFA Geometry iD= "<<iD<<endl;
-cout<<"nameVolume= "<<nameVolume<<endl<<endl;
+		//cout<<"CALIFA Geometry iD= "<<iD<<endl;
+		//cout<<"nameVolume= "<<nameVolume<<endl<<endl;
 
   return nameVolume.Data();
 }
 
+
+
+
+//GetDistanceThroughCrystals not works always returns distance=0
 double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction, TVector3 *hitPos, int *numCrystals, int *crystalIds)
 {
-  int maxNumCrystals = 0;
+ int maxNumCrystals = 0;
 
-  if(numCrystals != NULL && crystalIds != NULL)
+  if(numCrystals != NULL && crystalIds != NULL)//Aqui establece el num max de cry que tu le quieras ponder
   {
     maxNumCrystals = *numCrystals;
+		cout<<"maxNumCrystals="<<maxNumCrystals<<endl;
     *numCrystals = 0;
   }
-
+	//maxNumCrystals = 500; lo he puesto para probar, pero no cambia nada...
   TGeoNode *n;
-
+//InitTrack() Setting both initial point and direction and finding the state: 
   gGeoManager->InitTrack(startVertex.X(), startVertex.Y(), startVertex.Z(),
       direction.X()/direction.Mag(), direction.Y()/direction.Mag(), direction.Z()/direction.Mag());
 
@@ -327,18 +332,25 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVec
   bool inCrystal = false, wasInCrystal = false;
   TString nodeName;
 
+//find the distance to the next boundary and then extrapolate the current point/direction 
+//with this distance making sure that the boundary was crossed. Finally the goal would be to find the next state 
+//after crossing the boundary
   while((n = gGeoManager->FindNextBoundaryAndStep()))
   {
     nodeName = n->GetName();
+		cout<<"nodeName="<<nodeName<<endl;
 
-    if(inCrystal)
-      distance += gGeoManager->GetStep();
+    if(inCrystal) distance += gGeoManager->GetStep();
+			cout<<"distance="<<distance<<endl;//always 0 ¿?
 
     inCrystal = nodeName.BeginsWith("Crystal_");
+		cout<<"inCrystal="<<inCrystal<<endl;//always 0 ¿?
+		cout<<"maxNumCrystals="<<maxNumCrystals<<endl;//always 0 ¿?
 
-    if(inCrystal && maxNumCrystals != 0)
+    if(inCrystal && maxNumCrystals != 0)//not enter inside this loop, why?¿
     {
       int cid = GetCrystalId(gGeoManager->GetPath());
+			cout<<"----------------------  HEREEEEE                       cid="<<cid<<endl;
       if(cid != -1 && (*numCrystals == 0 || cid != crystalIds[(*numCrystals)-1]))
       {
         crystalIds[(*numCrystals)++] = cid;
@@ -353,10 +365,16 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVec
       wasInCrystal = true;
     }
   }
-
+	
   return distance;
 }
 
+
+
+
+
+//Waiting for what we should do in this function, PROBLEM: path size is variable
+//path=/cave_1/CalifaWorld_0/Alveolus_3_13/AlveolusInner_3_1/CrystalWithWrapping_2_2_1/Crystal_2_2_1
 int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 {
   std::vector<const char*> volumeNames;
@@ -365,7 +383,9 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 
   int crystalId = -1;
 
-  for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())
+	cout<<">>>CALIFA Geometry: Volume path "<<volumePath<<endl;
+
+  /*for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())
   {
     volumeNames.push_back(n->GetName());
     nodeCopies.push_back(n->GetNumber());
@@ -381,6 +401,12 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
     int cpCry = nodeCopies[1];
     int cpAlv = nodeCopies[2];
     int cpSupAlv = nodeCopies[3];
+
+cout<<">> CALIFA Geometry path= "<<volumePath<<endl;
+cout<<">> CALIFA Geometry cp1="<<cp1<<endl;
+cout<<">> CALIFA Geometry cpCry="<<cpCry<<endl;
+cout<<">> CALIFA Geometry cpAlv="<<cpAlv<<endl;
+cout<<">> CALIFA Geometry cpSupAlv="<<cpSupAlv<<endl;
 
     int crystalType, crystalCopy;
 
@@ -438,8 +464,8 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
       LOG(ERROR) << "R3BCalifaGeometry: Impossible crystalType for geometryVersion 16+." 
 		      << FairLogger::endl;
       return -1;
-    }
-
+    }*/
+	//cout<<">> CALIFA Geometry crystalId="<<crystalId<<endl;
   return crystalId;
 }
 

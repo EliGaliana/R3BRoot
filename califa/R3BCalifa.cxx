@@ -468,7 +468,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
     info.cpCry = cpCry;
 
     
-    bool Print_Cryinfo=kTRUE;
+    bool Print_Cryinfo=kFALSE;
     if(Print_Cryinfo)
     {
 			cout<<">>> CALIFA main class <<<"<<endl;
@@ -618,7 +618,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             {
                 // running from 0*4+0+1=1 to 31*4+3+1=128
                 info.crystalCopy = cpSupAlv * 4 + cpCry + 1;
-                // running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
+                // running from 32+0*128+0*4+0+1=33 to 32+14*128+31*4+3+1=1952
                 info.crystalId = 32 + (info.crystalType - 2) * 128 + cpSupAlv * 4 + cpCry + 1;
             }
             if (info.crystalType > 16 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
@@ -641,15 +641,36 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
  						Double_t polar;
 						Double_t azimuthal;
 						Double_t rho;
+						Int_t id;
 
-						//GetAngles
-						//CalifaGeo->GetAngles(info.crystalId, polar, azimuthal, rho);
-						//cout<<"CALIFA main: info.crystalId="<<info.crystalId<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
+						//GetAngles ->done
+						CalifaGeo->GetAngles(info.crystalId, polar, azimuthal, rho);
+						cout<<"CALIFA main: info.crystalId="<<info.crystalId<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
 
-						//GetPath
+						//GetPath ->done
 						path=CalifaGeo->GetCrystalVolumePath(info.crystalId);
-						cout<<"CALIFA main: info.crystalId="<<info.crystalId<<endl;
-						cout<<"CALIFA main: path="<<path<<endl<<endl<<endl<<endl;
+						//cout<<"CALIFA main: info.crystalId="<<info.crystalId<<endl;
+						cout<<"CALIFA main: path="<<path<<endl;
+
+						//GetCrystalId ->not yet
+						id=CalifaGeo->GetCrystalId(path);//NO va
+						//cout<<">>> CALIFA main: path"<<gMC->CurrentVolPath()<<endl;
+						//cout<<">>> CALIFA main: return id="<<id<<endl<<endl<<endl<<endl;
+//double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction, TVector3 *hitPos, int *numCrystals, int *crystalIds)
+
+						//GetDistanceThroughCrystals
+						TVector3 startVertex;
+						TVector3 direction;
+						TVector3 *hitPos;
+						Int_t *numCrystals;
+						//*numCrystals=4; 
+						Int_t *crystalIds;
+						Double_t distance;
+						startVertex={0,0,0};//need initialize these two vectors, otherwise not works at all
+						direction={5,5,5};
+
+						distance=CalifaGeo->GetDistanceThroughCrystals(startVertex,direction,hitPos,numCrystals,crystalIds);
+						cout<<endl<<endl<<endl<<"distance="<<distance<<endl;
 
    return kTRUE;
  
