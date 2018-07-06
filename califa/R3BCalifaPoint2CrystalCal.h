@@ -1,5 +1,5 @@
 // ------------------------------------------------------------
-// -----      R3BCalifaDigitizer header file           		-----
+// -----      R3BCalifaPoint2CrystalCal header file           		-----
 // -----      Created 1/03/2018 by E.Galiana          		-----
 // -----                                                  -----
 // ------------------------------------------------------------
@@ -17,19 +17,19 @@
 #include "TRandom3.h"
 #include "string"
 
-class R3BCalifaDigitizer : public FairTask
+class R3BCalifaPoint2CrystalCal : public FairTask
 {
 
  public:
 
   /** Default constructor **/  
-  R3BCalifaDigitizer();
+  R3BCalifaPoint2CrystalCal();
   
  /** Standard contructor **/
- R3BCalifaDigitizer(const TString& geoFile);
+ R3BCalifaPoint2CrystalCal(const TString& geoFile);
 
  /** Destructor **/
- ~R3BCalifaDigitizer();
+ ~R3BCalifaPoint2CrystalCal();
 
  /** Virtual method Init **/
  virtual InitStatus Init();
@@ -95,7 +95,7 @@ class R3BCalifaDigitizer : public FairTask
      **/
      void SetNonUniformity(Double_t nonU);
 	
-   ClassDef(R3BCalifaDigitizer,1);
+   ClassDef(R3BCalifaPoint2CrystalCal,1);
   
 };
 

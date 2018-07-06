@@ -274,8 +274,8 @@ void runsim(Int_t nEvents = 5)
     califaHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
     run->AddTask(califaHF);
   }
-  R3BCalifaDigitizer* califaDigit = new R3BCalifaDigitizer();
-  run->AddTask(califaDigit);
+  R3BCalifaPoint2CrystalCal* califaPoint2CryCal = new R3BCalifaPoint2CrystalCal();
+  run->AddTask(califaPoint2CryCal);
 
   // -----   Initialize simulation run   ------------------------------------
   run->Init();

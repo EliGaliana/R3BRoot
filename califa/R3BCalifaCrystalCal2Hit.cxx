@@ -285,7 +285,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
               usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
               
               if(kSimulation)
-                  eInc += dynamic_cast<R3BCalifaCrystalCalDataSim*>(crystalHit[i])->GetEinc();
+									eInc += dynamic_cast<R3BCalifaCrystalCalDataSim*>(crystalHit[i])->GetEinc();//change the name
         }
       }
     }

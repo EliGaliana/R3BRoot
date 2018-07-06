@@ -4,6 +4,8 @@
  * @author Max Winkel <max.winkel@ph.tum.de>
  *
  * Modified: 16/12/2016, P.Cabanelas
+ *
+ * Modified: 01/07/2018, E.Galiana
  */
 
 #ifndef R3BCALIFAGEOMETRY_H

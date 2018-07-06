@@ -310,18 +310,17 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD) //WORKING
 
 
 
-//GetDistanceThroughCrystals not works always returns distance=0
 double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction, TVector3 *hitPos, int *numCrystals, int *crystalIds)
 {
  int maxNumCrystals = 0;
 
-  if(numCrystals != NULL && crystalIds != NULL)//Aqui establece el num max de cry que tu le quieras ponder
+  if(numCrystals != NULL && crystalIds != NULL)
   {
     maxNumCrystals = *numCrystals;
 		cout<<"maxNumCrystals="<<maxNumCrystals<<endl;
     *numCrystals = 0;
   }
-	//maxNumCrystals = 500; lo he puesto para probar, pero no cambia nada...
+
   TGeoNode *n;
 //InitTrack() Setting both initial point and direction and finding the state: 
   gGeoManager->InitTrack(startVertex.X(), startVertex.Y(), startVertex.Z(),
@@ -341,13 +340,15 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVec
 		cout<<"nodeName="<<nodeName<<endl;
 
     if(inCrystal) distance += gGeoManager->GetStep();
-			cout<<"distance="<<distance<<endl;//always 0 ¿?
+			cout<<"distance="<<distance<<endl;
 
-    inCrystal = nodeName.BeginsWith("Crystal_");
-		cout<<"inCrystal="<<inCrystal<<endl;//always 0 ¿?
-		cout<<"maxNumCrystals="<<maxNumCrystals<<endl;//always 0 ¿?
+    inCrystal = nodeName.BeginsWith("CrystalWithWrapping_");//can't enter to Crystal volume
+		cout<<"inCrystal="<<inCrystal<<endl;
+		cout<<"maxNumCrystals="<<maxNumCrystals<<endl;
 
-    if(inCrystal && maxNumCrystals != 0)//not enter inside this loop, why?¿
+		//maxNumCrystals=500;
+
+    if(inCrystal && maxNumCrystals != 0)//this works if we put a maxNumCrystals different of 0
     {
       int cid = GetCrystalId(gGeoManager->GetPath());
 			cout<<"----------------------  HEREEEEE                       cid="<<cid<<endl;

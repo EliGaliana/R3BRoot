@@ -1,10 +1,10 @@
 // ------------------------------------------------------------
-// -----      R3BCalifaDigitizer header file           		-----
+// -----      R3BPoint2CrystalCal header file           		-----
 // -----      Created 1/03/2018 by E.Galiana          		-----
 // -----                                                  -----
 // ------------------------------------------------------------
 
-#include "R3BCalifaDigitizer.h"
+#include "R3BCalifaPoint2CrystalCal.h"
 #include "R3BCalifa.h"
 #include "TClonesArray.h"
 #include "FairRootManager.h"
@@ -22,20 +22,20 @@ using std::cerr;
 using std::endl;
 
 
-//R3BCalifaDigitizer: Default Constructor
-R3BCalifaDigitizer::R3BCalifaDigitizer() : FairTask("R3B CALIFA Digitizer") {
+//R3BCalifaPoint2CrystalCal: Default Constructor
+R3BCalifaPoint2CrystalCal::R3BCalifaPoint2CrystalCal() : FairTask("R3B CALIFA Point2CrystalCal") {
 }
 
-//R3BCalifaDigitizer: Constructor
-R3BCalifaDigitizer::R3BCalifaDigitizer(const TString& geoFile) : FairTask("R3B CALIFA Digitizer"),
+//R3BCalifaPoint2CrystalCal: Constructor
+R3BCalifaPoint2CrystalCal::R3BCalifaPoint2CrystalCal(const TString& geoFile) : FairTask("R3B CALIFA Point2CrystalCal"),
 								 fCalifaPointDataCA(NULL),
 								 fCalifaCryCalDataCA(NULL),
 	 							 fNonUniformity(0),
 								 fGeometryVersion(1) {
 }
 
-//Virtual R3BCalifaDigitizer: Destructor
-R3BCalifaDigitizer::~R3BCalifaDigitizer() {  
+//Virtual R3BCalifaPoint2CrystalCal: Destructor
+R3BCalifaPoint2CrystalCal::~R3BCalifaPoint2CrystalCal() {  
   if (fCalifaPointDataCA) {
     fCalifaPointDataCA->Delete();
     delete fCalifaPointDataCA;
@@ -46,12 +46,12 @@ R3BCalifaDigitizer::~R3BCalifaDigitizer() {
   }
   
   //Nota: delete TArrayF cryId[nHits], energyId[nHits], Sumaenergy[nHits];
-  LOG(INFO) << "R3BCalifaDigitizer: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaPoint2CrystalCal: Delete instance" << FairLogger::endl;
 }
 
 
 // -----   Public method Init   --------------------------------------------
-InitStatus R3BCalifaDigitizer::Init() {
+InitStatus R3BCalifaPoint2CrystalCal::Init() {
   //INPUT DATA
   //Point data
   FairRootManager* rootManager = FairRootManager::Instance();
@@ -70,7 +70,7 @@ InitStatus R3BCalifaDigitizer::Init() {
 
 
 // -----   Public method Execution   --------------------------------------------
-void R3BCalifaDigitizer::Exec(Option_t* option) {
+void R3BCalifaPoint2CrystalCal::Exec(Option_t* option) {
   //Reading the Input -- Point data --
   Int_t nHits = fCalifaPointDataCA->GetEntries();
   if(!nHits) return;
@@ -156,31 +156,31 @@ void R3BCalifaDigitizer::Exec(Option_t* option) {
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BCalifaDigitizer::EndOfEvent() {
+void R3BCalifaPoint2CrystalCal::EndOfEvent() {
   fCalifaCryCalDataCA->Clear();
   ResetParameters();
 }
 
 // -----   Public method Register   -------------------------------------------
-void R3BCalifaDigitizer::Register() {
+void R3BCalifaPoint2CrystalCal::Register() {
   FairRootManager::Instance()->Register("CrystalCal", GetName(),
 					fCalifaCryCalDataCA, kTRUE);
 }
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BCalifaDigitizer::Reset() {
+void R3BCalifaPoint2CrystalCal::Reset() {
   fCalifaCryCalDataCA->Clear();
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method FinishEvent   ----------------------------------------------
-void R3BCalifaDigitizer::FinishEvent() {
+void R3BCalifaPoint2CrystalCal::FinishEvent() {
 }
 // ----------------------------------------------------------------------------
 
 // -----   Private method AddCrystalHit   --------------------------------------------
-R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
+R3BCalifaCrystalCalData* R3BCalifaPoint2CrystalCal::AddCrystalCal(Int_t ident,
 							   Double_t energy,
 							   Double_t Nf,
 							   Double_t Ns,
@@ -188,7 +188,7 @@ R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
 							   Double_t tot_energy) {
   TClonesArray& clref = *fCalifaCryCalDataCA;
   Int_t size = clref.GetEntriesFast();
-  LOG(INFO) << "-I- R3BCalifaDigitizer: Adding CrystalCalData "
+  LOG(INFO) << "-I- R3BCalifaPoint2CrystalCal: Adding CrystalCalData "
 	    << " with unique identifier " << ident << " entering with "
 	    << energy * 1e06 << " keV Nf=" << Nf << " Ns=" << Ns <<" Time="<<time
 	    << " tot_energy=" <<tot_energy << FairLogger::endl;
@@ -199,7 +199,7 @@ R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
 // ----------------------------------------------------------------------------
 
 // -----   Private method NUSmearing  --------------------------------------------
-Double_t R3BCalifaDigitizer::NUSmearing(Double_t inputEnergy) {
+Double_t R3BCalifaPoint2CrystalCal::NUSmearing(Double_t inputEnergy) {
   // Very simple preliminary scheme where the NU is introduced as a flat random
   // distribution with limits fNonUniformity (%) of the energy value.
   //
@@ -208,7 +208,7 @@ Double_t R3BCalifaDigitizer::NUSmearing(Double_t inputEnergy) {
 }
 
 // -----  Public method SetNonUniformity  ----------------------------------
-void R3BCalifaDigitizer::SetNonUniformity(Double_t nonU) {
+void R3BCalifaPoint2CrystalCal::SetNonUniformity(Double_t nonU) {
   fNonUniformity = nonU;
-  LOG(INFO) << "R3BCalifaDigitizer::SetNonUniformity to " << fNonUniformity << " %" << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaPoint2CrystalCal::SetNonUniformity to " << fNonUniformity << " %" << FairLogger::endl;
 }

@@ -417,6 +417,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
         stack->AddPoint(kCALIFA);
 
         ResetParameters();
+
     }
 
     return kTRUE;
@@ -661,15 +662,15 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
 						//GetDistanceThroughCrystals
 						TVector3 startVertex;
 						TVector3 direction;
-						TVector3 *hitPos;
+						TVector3 hitPos;
 						Int_t *numCrystals;
 						//*numCrystals=4; 
 						Int_t *crystalIds;
 						Double_t distance;
-						startVertex={0,0,0};//need initialize these two vectors, otherwise not works at all
-						direction={5,5,5};
+						startVertex={5,0,5};//need initialize these two vectors, otherwise not works at all
+						direction={3,3,3};
 
-						distance=CalifaGeo->GetDistanceThroughCrystals(startVertex,direction,hitPos,numCrystals,crystalIds);
+						distance=CalifaGeo->GetDistanceThroughCrystals(startVertex,direction,&hitPos);
 						cout<<endl<<endl<<endl<<"distance="<<distance<<endl;
 
    return kTRUE;
