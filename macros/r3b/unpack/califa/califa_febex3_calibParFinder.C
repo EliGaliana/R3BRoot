@@ -58,18 +58,18 @@ void califa_febex3_calibParFinder() {
   EnergythePeaks->AddAt(e2,1);
   
   TArrayF* Sigma=new TArrayF;
-  Sigma->Set(512);
+  Sigma->Set(448);
   
   TArrayF* Bins=new TArrayF;
-  Bins->Set(512);
+  Bins->Set(448);
   
   TArrayF* Left=new TArrayF;
-  Left->Set(512)
+  Left->Set(448)
       
   TArrayF* Right=new TArrayF;
-  Right->Set(512);
+  Right->Set(448);
 
-  for(Int_t i=0;i<512;i++){//watch out! CryId-1
+  for(Int_t i=0;i<448;i++){//watch out! CryId-1
 
     if(i==293 || i==301 || i==307 || i==338 || i==339 || i==348 ||i==373){
       Sigma->AddAt(20.,i);
@@ -86,7 +86,7 @@ void califa_febex3_calibParFinder() {
  
   
   R3BCalifaMapped2CrystalCalPar* CalPar = new R3BCalifaMapped2CrystalCalPar();  
-  CalPar->SetNumCrystals(512); //7 petals*64cry
+  CalPar->SetNumCrystals(448); //7 petals*64cry
   CalPar->SetMinStadistics(100);
   CalPar->SetNumParameterFit(2);//OPTIONAL by default 2
   CalPar->SetCalRange_left(Left);//by default 200  

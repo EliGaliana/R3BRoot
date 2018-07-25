@@ -65,7 +65,7 @@ void califa_febex3_online(){
 
   // R3BOnlineSpectra ----------------------------------------------------------
   Bool_t ON=false;
-  Int_t petals=8;
+  Int_t petals=7;
   //Int_t crystalId=65;
   
   R3BCalifaOnlineSpectra* online= new R3BCalifaOnlineSpectra();
@@ -75,9 +75,8 @@ void califa_febex3_online(){
   // online->SetOneCrystal(crystalId);
   run->AddTask(online);
 
-  R3BAmsOnlineSpectra* onlineams= new R3BAmsOnlineSpectra();
-  
-  run->AddTask(onlineams);
+  //R3BAmsOnlineSpectra* onlineams= new R3BAmsOnlineSpectra();  
+  //run->AddTask(onlineams);
   
   // Initialize ----------------------------------------------------------------
   //run->Init();
@@ -89,7 +88,7 @@ void califa_febex3_online(){
   run->Init();
   run->Run(nev, 0);
   //rtdb->saveOutput();
-  // delete run;
+  //delete run;
 
   timer.Stop();
   Double_t rtime = timer.RealTime();
