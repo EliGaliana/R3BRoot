@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 //// ** elisabet.galiana@usc.es
 //// ** Universidad de Santiago de Compostela
-//// ** Dpto. Física de Partículas
+//// ** Dpto. FÃ­sica de PartÃ­culas
 ////
 ////	--- Check Resutls of CALIFA detector ---
 ////
@@ -11,7 +11,7 @@
 ////
 ////	General Usage:
 ////	1st: select the root file and the settings:
-////	   -maximum energy & channels, range CryId of the petals 
+////	   -max,min energy & channels, range CryId of the petals 
 ////	   -Histograms: change the ranges and bins (OPTIONAL)
 ////
 ////	2nd: root -l checkResults.C
@@ -29,7 +29,7 @@ void checkResults() {
   //// SETTINGS: SELECT HERE THE SETTING CONTROLING THE MACRO
   /////////////////////////////////////////////////////////////
   //INPUT FILE
-  char inputFile[250] = "../../../../../Calibration_Krakow17/data_0001.root";  //change root file
+  char inputFile[250] = "dataCal_003_60Co.root";  //change root file dataCal_0008_0066_22Na.root
   TFile *file1 = TFile::Open(inputFile);
   //READING TREE
   TTree* tree = (TTree*)file1->Get("evt");
@@ -43,26 +43,33 @@ void checkResults() {
   
   //Maximum energy
   Double_t maxE;
+  Double_t minE;
   Int_t binEnergy;
-  maxE=2000;//kev
-  binEnergy=40000;
+  minE=1100;
+  maxE=1400;//kev
+  binEnergy=150;
   
   //Range CrystalId 
   //Petal 1
   Int_t P1_1, P1_2;
-  P1_1=64;
-  P1_2=129;
+  P1_1=0;
+  P1_2=64;
   
   //Petal 2
   Int_t P2_1, P2_2;
-  P2_1=383;
-  P2_2=449;
+  P2_1=64;
+  P2_2=128;
   
   //Petal 3
   Int_t P3_1, P3_2;
-  P3_1=448;
-  P3_2=513;
+  P3_1=256;
+  P3_2=320;
+
   
+  //Petal 4
+  Int_t P4_1, P4_2;
+  P4_1=320;
+  P4_2=384;  
   ////////////////////////////////////////////////////////////////
   //// END OF SETTINGS: HISTOGRAMS RANGE COULD BE MODIFIED BELOW
   ////////////////////////////////////////////////////////////////
@@ -74,20 +81,29 @@ void checkResults() {
   TH2F *h1, *h2_P1, *h2_P2, *h2_P3;
   
   //HISTOGRAMS CREATION ------------------------------------------------------------  Change these ranges and bins (OPTIONAL)
-  h1_Map = new TH1F("h1_Map","Crystal ID",513,1,513);
+  h1_Map = new TH1F("h1_Map","Crystal ID",512,0.5,512.5);
   h2_Map = new TH1F("h2_Map","Channels energy",binChannels,0,maxChannels); 
   
-  h1_Cal = new TH1F("h1_Cal","Crystal ID",513,1,513);
-  h2_Cal = new TH1F("h2_Cal","Energy",binEnergy,0,maxE); 
+  h1_Cal = new TH1F("h1_Cal","Crystal ID",512,0.5,512.5);
+  h2_Cal = new TH1F("h2_Cal","Energy",binEnergy,minE,maxE); 
   
-  h3_Cal_P1 = new TH1F("h3_Cal_P1","Energy of Petal 1",binEnergy,0,maxE); 
-  h3_Cal_P2 = new TH1F("h3_Cal_P2","Energy of Petal 2",binEnergy,0,maxE); 
-  h3_Cal_P3 = new TH1F("h3_Cal_P3","Energy of Petal 3",binEnergy,0,maxE); 
+  h3_Cal_P1 = new TH1F("h3_Cal_P1","Energy of Petal 1",binEnergy,minE,maxE); 
+  h3_Cal_P2 = new TH1F("h3_Cal_P2","Energy of Petal 2",binEnergy,minE,maxE); 
+  h3_Cal_P3 = new TH1F("h3_Cal_P3","Energy of Petal 3",binEnergy,minE,maxE);
+  h3_Cal_P4 = new TH1F("h3_Cal_P4","Energy of Petal 4",binEnergy,minE,maxE); 
   
-  h1 = new TH2F("h1","Energy vs CrystalId",513,1,513,binEnergy,200,maxE);
-  h2_P1 = new TH2F("h2_P1","Petal1: Energy vs CrylId",64,65,129,binEnergy,200,maxE);
-  h2_P2 = new TH2F("h2_P2","Petal2: Energy vs CrylId",64,384,448,binEnergy,200,maxE);
-  h2_P3 = new TH2F("h2_P3","Petal3: Energy vs CrylId",64,449,513,binEnergy,200,maxE);
+  h1 = new TH2F("h1","Energy vs CrystalId",512,0.5,512.5,binEnergy,minE,maxE);
+  
+  h2_P1 = new TH2F("h2_P1","Petal1: Energy vs CrylId",64,64.5,127.5,binEnergy,minE,maxE);
+  h2_P2 = new TH2F("h2_P2","Petal2: Energy vs CrylId",64,128.5,195.5,binEnergy,minE,maxE);
+  h2_P3 = new TH2F("h2_P3","Petal3: Energy vs CrylId",64,256.5,319.5,binEnergy,minE,maxE);
+  h2_P4 = new TH2F("h2_P4","Petal4: Energy vs CrylId",64,320.5,383.5,binEnergy,minE,maxE);
+
+  h2_P5 = new TH2F("h2_P5","Petal5: Energy vs CrylId",64,64.5,127.5,binEnergy,minE,maxE);
+  h2_P6 = new TH2F("h2_P6","Petal6: Energy vs CrylId",64,128.5,195.5,binEnergy,minE,maxE);
+  h2_P7 = new TH2F("h2_P7","Petal7: Energy vs CrylId",64,256.5,319.5,binEnergy,minE,maxE);
+  h2_P8 = new TH2F("h2_P8","Petal8: Energy vs CrylId",64,320.5,383.5,binEnergy,minE,maxE);
+
   
   //----- CALIFA detector--------------//
   
@@ -168,6 +184,12 @@ void checkResults() {
 	   h3_Cal_P3->Fill(calData[h]->GetEnergy());
 	   h2_P3->Fill(calData[h]->GetCrystalId(),calData[h]->GetEnergy());
 	 }
+       //Petal4
+       if (calData[h]->GetCrystalId()>P4_1 && calData[h]->GetCrystalId()<P4_2)
+	 {
+	   h3_Cal_P4->Fill(calData[h]->GetEnergy());
+	   h2_P4->Fill(calData[h]->GetCrystalId(),calData[h]->GetEnergy());
+	 }
        
      }
      
@@ -231,6 +253,12 @@ void checkResults() {
   h3_Cal_P3->SetLineColor(13);
   h3_Cal_P3->GetXaxis()->SetTitle("Energy (keV)");
   h3_Cal_P3->GetYaxis()->SetTitle("Counts");
+  c4->cd(4);
+  h3_Cal_P4->Draw();
+  h3_Cal_P4->SetLineColor(13);
+  h3_Cal_P4->GetXaxis()->SetTitle("Energy (keV)");
+  h3_Cal_P4->GetYaxis()->SetTitle("Counts");
+
   
   TCanvas* c5 = new TCanvas("Petals Energy vs CryId","Petals Energy vs CryId",0,0,400,800);
   c5->SetFillColor(0);
@@ -248,5 +276,10 @@ void checkResults() {
   h2_P3->Draw("colz");
   h2_P3->GetXaxis()->SetTitle("CryId");
   h2_P3->GetYaxis()->SetTitle("Energy (keV)");
+  c5->cd(4);
+  h2_P4->Draw("colz");
+  h2_P4->GetXaxis()->SetTitle("CryId");
+  h2_P4->GetYaxis()->SetTitle("Energy (keV)");
   
 }
+

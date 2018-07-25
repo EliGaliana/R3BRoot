@@ -49,7 +49,9 @@ R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar() :
   fSigma(0),
   fThreshold(0),
   fEnergyPeaks(NULL),
-  fOutputFile(NULL) {
+  fOutputFile(NULL),
+  fDebugMode(0)
+{
   
 }
 
@@ -68,7 +70,9 @@ R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar(const char* name, I
   fSigma(0),
   fThreshold(0),
   fEnergyPeaks(NULL),
-  fOutputFile(NULL) {
+  fOutputFile(NULL),
+  fDebugMode(0)
+{
   
 }
 
@@ -81,18 +85,50 @@ R3BCalifaMapped2CrystalCalPar::~R3BCalifaMapped2CrystalCalPar() {
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaMapped2CrystalCalPar::Init() {
-  
+
   if(!fEnergyPeaks){
     fEnergyPeaks = new TArrayF;
     fEnergyPeaks->Set(fNumPeaks);
   }
-  
+ 
+  if(!fSigma){
+    fSigma = new TArrayF;
+    fSigma->Set(fNumCrystals);
+		for(Int_t i=0;i<fNumCrystals;i++){fSigma->AddAt(3.,i);}//by default sigma=3
+  }
+ 
+  if(!fMapHistos_bins){
+    fMapHistos_bins = new TArrayF;
+    fMapHistos_bins->Set(fNumCrystals);
+		for(Int_t i=0;i<fNumCrystals;i++){fMapHistos_bins->AddAt(900.,i);}//by default bins=900
+  }
+
+	if(!fMapHistos_left){
+		  fMapHistos_left = new TArrayF;
+		  fMapHistos_left->Set(fNumCrystals);
+			for(Int_t i=0;i<fNumCrystals;i++){fMapHistos_left->AddAt(200.,i);}//by default left_range=200
+		}
+
+	if(!fMapHistos_right){
+		  fMapHistos_right = new TArrayF;
+		  fMapHistos_right->Set(fNumCrystals);
+			for(Int_t i=0;i<fNumCrystals;i++){fMapHistos_right->AddAt(2000.,i);}//by default right_range=2000
+		}
+
+
   char name[100];
   
   fh_Map_energy_crystal = new TH1F*[fNumCrystals];
+ 
   for(Int_t i=0;i<fNumCrystals;i++){
+    Float_t Bins;
+    Float_t right;
+    Float_t left;
+    Bins=fMapHistos_bins->GetAt(i);
+    right=fMapHistos_right->GetAt(i);
+    left=fMapHistos_left->GetAt(i);
     sprintf(name,"fh_Map_energy_crystal_%i",i+1);
-    fh_Map_energy_crystal[i] = new TH1F(name,name,fMapHistos_bins,fMapHistos_left,fMapHistos_right);
+    fh_Map_energy_crystal[i] = new TH1F(name,name,Bins,left,right);
   }
   
   FairRootManager* rootManager = FairRootManager::Instance();
@@ -182,16 +218,19 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
   fCal_Par->SetNumCrystals(fNumCrystals);
   fCal_Par->SetNumParametersFit(fNumParam);
   fCal_Par->GetCryCalParams()->Set(numPars*fNumCrystals);
-   
+
   TSpectrum *ss= new TSpectrum(fNumPeaks);  
   
   for (Int_t i=0;i<fNumCrystals;i++){
     
     if (fh_Map_energy_crystal[i]->GetEntries()>fMinStadistics){
       
-      nfound = ss->Search(fh_Map_energy_crystal[i],fSigma,"goff",fThreshold);
+      if(fDebugMode) nfound = ss->Search(fh_Map_energy_crystal[i],fSigma->GetAt(i),"",fThreshold);
+      else  nfound = ss->Search(fh_Map_energy_crystal[i],fSigma->GetAt(i),"goff",fThreshold);
+      //	std::cout<< i << " " << nfound <<" "<< fThreshold << std::endl;
       fChannelPeaks = (Double_t*) ss->GetPositionX();
       TMath::Sort(nfound, fChannelPeaks, idx, kTRUE);
+
       
       //Calibrated Spectrum
       Double_t X[fNumPeaks+1];
@@ -203,44 +242,48 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
       for (Int_t j=0;j<fNumPeaks;j++){
 	X[j+1]=fChannelPeaks[idx[fNumPeaks-j-1]];
 	Y[j+1]=fEnergyPeaks->GetAt(fNumPeaks-j-1);
+
+	std::cout<<"CrystalId="<<i+1<<" "<< j+1  <<" "<< X[j+1]  << std::endl;
       }
       
       TF1 *f1;
-      
+     
       if (fNumParam){
 	
 	if (fNumParam==1){
-	  f1 = new TF1 ("f1", "[0]*x", fMapHistos_left, fMapHistos_right);
+	  f1 = new TF1 ("f1", "[0]*x", fMapHistos_left->GetAt(i), fMapHistos_right->GetAt(i));
 	}
 	if (fNumParam==2){
-	  f1 = new TF1 ("f1", "[0]+[1]*x", fMapHistos_left, fMapHistos_right);
+	  f1 = new TF1 ("f1", "[0]+[1]*x", fMapHistos_left->GetAt(i), fMapHistos_right->GetAt(i));
 	}
 	if (fNumParam==3){
-	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)", fMapHistos_left, fMapHistos_right);
+	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)", fMapHistos_left->GetAt(i), fMapHistos_right->GetAt(i));
 	}
 	if (fNumParam==4){
-	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)", fMapHistos_left, fMapHistos_right);
+	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)", fMapHistos_left->GetAt(i), fMapHistos_right->GetAt(i));
 	}
 	if (fNumParam==5){
-	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)", fMapHistos_left, fMapHistos_right);
+	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)", fMapHistos_left->GetAt(i), fMapHistos_right->GetAt(i));
 	}
 	if (fNumParam>5){
 	  std::cout<<endl<<"ERROR: The number of fit parameters can not be higher than 5!"<<endl;
 	}
       }else{
 	std::cout<<endl<<"No imput number of fit parameters, therefore, by default NumberParameters=2"<<endl;
-	f1 = new TF1 ("f1", "[0]+[1]*x", fMapHistos_left, fMapHistos_right);
+	f1 = new TF1 ("f1", "[0]+[1]*x", fMapHistos_left->GetAt(i), fMapHistos_right->GetAt(i));
       }
       
       TGraph* graph = new TGraph (fNumPeaks+1, X, Y);
       graph->Fit("f1","Q");//Quiet mode (minimum printing)
-      
+
       
       for(Int_t h=0; h<numPars;h++){
 	fCal_Par->SetCryCalParams(f1->GetParameter(h),numPars*i+h);
 	Double_t par;
 	par=f1->GetParameter(h);
       }  
+
+      if(fDebugMode) fh_Map_energy_crystal[i]->Write();
       
     }else {std::cout<<"Histogram NO Fitted number "<<i+1<<endl;}
     

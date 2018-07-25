@@ -21,11 +21,12 @@ void califa_febex3_mapped2cal() {
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
-  TString filename = "/media/mbsdaq/extDisk/data/168_2018-06-07_12-38-32/dataMap_0001.lmd";
-  TString outputFileName = "./dataCal_0001.root";
+  TString filename = "/u/land/lynx.landexp/201810_s444/x86l-37/daq_bootstrap/data/006_2018-07-19_16-37-02/data_0003.lmd";//60Co
+  // TString filename = "/u/land/lynx.landexp/201810_s444/x86l-37/daq_bootstrap/data/008_2018-07-20_12-18-29/data_0066.lmd";//22Na
+  TString outputFileName = "./dataCal_003_60Co.root";
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  TString ucesb_path = ucesb_dir + "/../upexps/califaKrakow17/califa";
+  TString ucesb_path = ucesb_dir + "/../upexps/califa_s444/califa";
   EXT_STR_h101 ucesb_struct;
   
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
@@ -56,10 +57,10 @@ void califa_febex3_mapped2cal() {
   
   /* Runtime data base ------------------------------------ */
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  //FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
-  //parIo1->open("Params.par","in");
+  // FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
+  //parIo1->open("Califa_CalibParam_Ascii_run6.par","in");
   FairParRootFileIo* parIo1 = new FairParRootFileIo();//Root
-  parIo1->open("Califa_CalibParam.root","in");
+  parIo1->open("Califa_CalibParam_DoublePetal.root","in");
   rtdb->setFirstInput(parIo1);
   rtdb->print();
   /* ------------------------------------------------------ */
@@ -68,7 +69,7 @@ void califa_febex3_mapped2cal() {
   run->Init();
   run->Run(nev,0);
   //rtdb->saveOutput();
-  delete run;
+  //delete run;
   /* ------------------------------------------------------ */
   
   timer.Stop();
@@ -80,3 +81,4 @@ void califa_febex3_mapped2cal() {
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s"
        << endl << endl;
 }
+

@@ -21,13 +21,13 @@ void califa_febex3_calibParFinder() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "/media/mbsdaq/extDisk/data/168_2018-06-07_12-38-32/data_0001.lmd";
-  TString outputFileName = "./dataMap_0001.root";
+  TString filename = "/u/land/lynx.landexp/201810_s444/x86l-37/daq_bootstrap/data/006_2018-07-19_16-37-02/data_0003.lmd";
+  TString outputFileName = "./dataMap_0003.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
   
-  TString ucesb_path = ucesb_dir + "/../upexps/califaKrakow17/califa";
+  TString ucesb_path = ucesb_dir + "/../upexps/califa_s444/califa";
   
   EXT_STR_h101 ucesb_struct;
   
@@ -51,22 +51,51 @@ void califa_febex3_calibParFinder() {
   
   //R3BCalifaMapped2CrystalCalPar ----
   TArrayF* EnergythePeaks = new TArrayF();
-  Float_t e1=1332.5;
-  Float_t e2=1173.2;
+  Float_t e1=1332.5;//60-Co 1332.5;
+  Float_t e2=1173.2;//60-Co 1173.2;
   EnergythePeaks->Set(2);
   EnergythePeaks->AddAt(e1,0);
   EnergythePeaks->AddAt(e2,1);
   
+  TArrayF* Sigma=new TArrayF;
+  Sigma->Set(512);
+  
+  TArrayF* Bins=new TArrayF;
+  Bins->Set(512);
+  
+  TArrayF* Left=new TArrayF;
+  Left->Set(512)
+      
+  TArrayF* Right=new TArrayF;
+  Right->Set(512);
+
+  for(Int_t i=0;i<512;i++){//watch out! CryId-1
+
+    if(i==293 || i==301 || i==307 || i==338 || i==339 || i==348 ||i==373){
+      Sigma->AddAt(20.,i);
+      Bins->AddAt(550.,i);
+      Left->AddAt(300.,i);
+      Right->AddAt(1400.,i);
+    }else{
+      Sigma->AddAt(3.,i);
+      Bins->AddAt(500.,i);
+      Left->AddAt(250.,i);
+      Right->AddAt(1250.,i);
+    }
+  }
+ 
+  
   R3BCalifaMapped2CrystalCalPar* CalPar = new R3BCalifaMapped2CrystalCalPar();  
-  CalPar->SetNumCrystals(128); //2 petals*64cry
-  CalPar->SetMinStadistics(1000);
+  CalPar->SetNumCrystals(512); //7 petals*64cry
+  CalPar->SetMinStadistics(100);
   CalPar->SetNumParameterFit(2);//OPTIONAL by default 2
-  CalPar->SetCalRange_left(250);  
-  CalPar->SetCalRange_right(600);
-  CalPar->SetCalRange_bins(350);    
-  CalPar->SetSigma(3.0);
-  CalPar->SetThreshold(0.0001);      
+  CalPar->SetCalRange_left(Left);//by default 200  
+  CalPar->SetCalRange_right(Right);//by default 2000
+  CalPar->SetCalRange_bins(Bins);//by default 900
+  CalPar->SetSigma(Sigma);//by default 3.
+  CalPar->SetThreshold(70.);      
   CalPar->SetEnergyPeaks(EnergythePeaks);
+  CalPar->SetDebugMode(1);
   run->AddTask(CalPar);
 
   
@@ -87,21 +116,21 @@ void califa_febex3_calibParFinder() {
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open("Califa_CalibParam.root");
   rtdb->setOutput(parOut);
-  rtdb->saveOutput();
+  //rtdb->saveOutput();
   rtdb->print();
   
   //2-Ascii file with the Calibartion Parameters
-  /*FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
-    parIo1->open("Califa_CalibParam.par","out");
-    rtdb->setOutput(parIo1);
-    rtdb->saveOutput();
-    rtdb->print();*/
+  // FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
+  // parIo1->open("Califa_CalibParam_Ascii_run6.par","out");
+  //  rtdb->setOutput(parIo1);
+    //rtdb->saveOutput();
+    //rtdb->print();
   /* ------------------------------------------------------ */
   
   /* Run -------------------------------------------------- */
   run->Run(nev,0);
-  /*rtdb->saveOutput();*/
-  delete run;
+  rtdb->saveOutput();
+  //delete run;
   /* ------------------------------------------------------ */
 
   timer.Stop();
@@ -113,3 +142,4 @@ void califa_febex3_calibParFinder() {
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s"
        << endl << endl;
 }
+

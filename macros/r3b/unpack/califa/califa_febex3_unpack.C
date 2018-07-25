@@ -21,13 +21,13 @@ void califa_febex3_unpack() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "/media/mbsdaq/extDisk/data/168_2018-06-07_12-38-32/data_0001.lmd";
-  TString outputFileName = "./dataMap_0001.root";
+  TString filename = "/u/land/lynx.landexp/201810_s444/x86l-37/daq_bootstrap/data/006_2018-07-19_16-37-02/data_0002.lmd";
+  TString outputFileName = "./dataMap_0002_DPetal_60Co.root";
 
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
   
-  TString ucesb_path = ucesb_dir + "/../upexps/califaKrakow17/califa";
+  TString ucesb_path = ucesb_dir + "/../upexps/califa_s444/califa";//califaKrakow17
   
   EXT_STR_h101 ucesb_struct;
   
@@ -66,7 +66,7 @@ void califa_febex3_unpack() {
   /* Run -------------------------------------------------- */
   run->Run(nev,0);
   /*rtdb->saveOutput();*/
-  delete run;
+  //  delete run;
   /* ------------------------------------------------------ */
 
   timer.Stop();
@@ -78,3 +78,4 @@ void califa_febex3_unpack() {
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s"
        << endl << endl;
 }
+
