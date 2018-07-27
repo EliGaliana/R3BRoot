@@ -317,7 +317,7 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVec
   if(numCrystals != NULL && crystalIds != NULL)
   {
     maxNumCrystals = *numCrystals;
-		cout<<"maxNumCrystals="<<maxNumCrystals<<endl;
+		//cout<<"maxNumCrystals="<<maxNumCrystals<<endl;
     *numCrystals = 0;
   }
 
@@ -337,21 +337,21 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVec
   while((n = gGeoManager->FindNextBoundaryAndStep()))
   {
     nodeName = n->GetName();
-		cout<<"nodeName="<<nodeName<<endl;
+		//cout<<"nodeName="<<nodeName<<endl;
 
     if(inCrystal) distance += gGeoManager->GetStep();
-			cout<<"distance="<<distance<<endl;
+			//cout<<"distance="<<distance<<endl;
 
     inCrystal = nodeName.BeginsWith("CrystalWithWrapping_");//can't enter to Crystal volume
-		cout<<"inCrystal="<<inCrystal<<endl;
-		cout<<"maxNumCrystals="<<maxNumCrystals<<endl;
+		//cout<<"inCrystal="<<inCrystal<<endl;
+		//cout<<"maxNumCrystals="<<maxNumCrystals<<endl;
 
 		//maxNumCrystals=500;
 
-    if(inCrystal && maxNumCrystals != 0)//this works if we put a maxNumCrystals different of 0
+    if(inCrystal && maxNumCrystals != 0)//this works if we put a maxNumCrystals different of 0 
     {
       int cid = GetCrystalId(gGeoManager->GetPath());
-			cout<<"----------------------  HEREEEEE                       cid="<<cid<<endl;
+			//cout<<"----------------------  HEREEEEE                       cid="<<cid<<endl;
       if(cid != -1 && (*numCrystals == 0 || cid != crystalIds[(*numCrystals)-1]))
       {
         crystalIds[(*numCrystals)++] = cid;
@@ -384,7 +384,7 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 
   int crystalId = -1;
 
-	cout<<">>>CALIFA Geometry: Volume path "<<volumePath<<endl;
+	//cout<<">>>CALIFA Geometry: Volume path "<<volumePath<<endl;
 
   /*for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())
   {

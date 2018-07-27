@@ -646,12 +646,12 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
 
 						//GetAngles ->done
 						CalifaGeo->GetAngles(info.crystalId, polar, azimuthal, rho);
-						cout<<"CALIFA main: info.crystalId="<<info.crystalId<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
+						//cout<<"CALIFA main: info.crystalId="<<info.crystalId<<"  polar="<<polar<<"  azimuthal="<<azimuthal<<" rho="<<rho<<endl<<endl;
 
 						//GetPath ->done
 						path=CalifaGeo->GetCrystalVolumePath(info.crystalId);
 						//cout<<"CALIFA main: info.crystalId="<<info.crystalId<<endl;
-						cout<<"CALIFA main: path="<<path<<endl;
+						//cout<<"CALIFA main: path="<<path<<endl;
 
 						//GetCrystalId ->not yet
 						id=CalifaGeo->GetCrystalId(path);//NO va
@@ -671,7 +671,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
 						direction={3,3,3};
 
 						distance=CalifaGeo->GetDistanceThroughCrystals(startVertex,direction,&hitPos);
-						cout<<endl<<endl<<endl<<"distance="<<distance<<endl;
+						//cout<<endl<<endl<<endl<<"distance="<<distance<<endl;
 
    return kTRUE;
  
